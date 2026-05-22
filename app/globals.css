@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+*, *::before, *::after {
+  font-family: inherit;
+}
+
+body {
+  background: #ffffff;
+  color: #000000;
+  font-family: var(--font-poppins), sans-serif;
+}
