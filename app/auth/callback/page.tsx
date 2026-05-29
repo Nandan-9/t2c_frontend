@@ -30,7 +30,7 @@ export default function AuthCallbackPage() {
     })
       .then((tokens) => {
         tokenStorage.save(tokens);
-        router.replace(ROUTES.home);
+        router.replace(tokens.is_new_user ? ROUTES.setupUsername : ROUTES.home);
       })
       .catch((err: unknown) => {
         setErrorMsg(err instanceof Error ? err.message : "Something went wrong.");

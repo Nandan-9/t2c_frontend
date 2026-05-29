@@ -53,5 +53,6 @@ export interface UserAuthTokens {
   access_token: string;
   refresh_token: string;
   token_type: "Bearer";
+  is_new_user: boolean;
   user: RegularUser;
 }

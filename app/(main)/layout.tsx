@@ -97,8 +97,8 @@ function Sidebar({ onNewPost }: { onNewPost: () => void }) {
 
       {user && (
         <div className="flex items-center gap-2 px-2">
-          <AvatarCircle avatar_url={"avatar_url" in user ? (user as RegularUser).avatar_url : null} username={user.email.split("@")[0]} size="sm" />
-          <p className="text-sm text-gray-700 truncate flex-1">{user.email.split("@")[0]}</p>
+          <AvatarCircle avatar_url={"avatar_url" in user ? (user as RegularUser).avatar_url : null} username={user.username} size="sm" />
+          <p className="text-sm text-gray-700 truncate flex-1">{user.username}</p>
           <button
             onClick={handleLogout}
             className="text-xs text-gray-400 hover:text-gray-600"

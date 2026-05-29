@@ -14,5 +14,6 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://loca
 export const ROUTES = {
   login: "/login",
   callback: "/auth/callback",
+  setupUsername: "/setup-username",
   home: "/",
 } as const;

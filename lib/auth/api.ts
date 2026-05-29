@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "./config";
-import type { AdminAuthTokens, AdminLoginPayload, AuthTokens, GoogleAuthPayload, GoogleCallbackPayload, UserAuthTokens } from "./types";
+import type { AdminAuthTokens, AdminLoginPayload, AuthTokens, GoogleAuthPayload, GoogleCallbackPayload, RegularUser, UserAuthTokens } from "./types";
 import { tokenStorage } from "./tokens";
 
 async function post<T>(path: string, body: unknown, token?: string): Promise<T> {
@@ -20,8 +20,8 @@ async function post<T>(path: string, body: unknown, token?: string): Promise<T> 
   return res.json() as Promise<T>;
 }
 
-export async function exchangeGoogleCode(payload: GoogleCallbackPayload): Promise<AuthTokens> {
-  return post<AuthTokens>("/auth/google/", payload);
+export async function exchangeGoogleCode(payload: GoogleCallbackPayload): Promise<UserAuthTokens> {
+  return post<UserAuthTokens>("/auth/google/", payload);
 }
 
 export async function refreshAccessToken(): Promise<{ access_token: string }> {
@@ -67,4 +67,33 @@ export async function userLogout(): Promise<void> {
 
   await post("/auth/logout/", { refresh_token: refresh }, access).catch(() => {});
   tokenStorage.clear();
+}
+
+export async function checkUsernameAvailability(username: string): Promise<{ available: boolean }> {
+  const res = await fetch(
+    `${API_BASE_URL}/users/me/username/check/?username=${encodeURIComponent(username)}`,
+  );
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? `Request failed: ${res.status}`);
+  }
+  return res.json() as Promise<{ available: boolean }>;
+}
+
+export async function setUsername(username: string): Promise<RegularUser> {
+  const access = tokenStorage.getAccess();
+  const res = await fetch(`${API_BASE_URL}/users/me/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...(access ? { Authorization: `Bearer ${access}` } : {}),
+    },
+    body: JSON.stringify({ username }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const usernameErrors = (data as { username?: string[] }).username;
+    throw new Error(usernameErrors?.[0] ?? `Request failed: ${res.status}`);
+  }
+  return data as RegularUser;
 }
