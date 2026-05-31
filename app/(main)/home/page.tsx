@@ -1,107 +1,221 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { posts as postsApi, type Post } from "@/lib/api/posts";
-import { ministers as ministersApi } from "@/lib/api/ministers";
+import { posts as postsApi, type Post, type FeedPage, type LatestPage } from "@/lib/api/posts";
+import { getMyFollowing } from "@/lib/api/ministers";
 import { PostComposer } from "@/components/ui/PostComposer";
 import { PostCard } from "@/components/ui/PostCard";
+import { AvatarCircle } from "@/components/ui/AvatarCircle";
 import { tokenStorage } from "@/lib/auth/tokens";
 import type { RegularUser } from "@/lib/auth/types";
 
+type Tab = "all" | "trending" | "latest" | "responded";
+
+type UpvoteCursor = { kind: "upvote"; cursor_upvote_count: number; cursor_id: number };
+type LatestCursor = { kind: "latest"; cursor_created_at: string; cursor_id: number };
+type NextCursor = UpvoteCursor | LatestCursor | null;
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "trending", label: "Trending" },
+  { id: "latest", label: "Latest" },
+  { id: "responded", label: "Responded" },
+];
+
+function upvoteCursorFrom(page: FeedPage): UpvoteCursor | null {
+  if (page.next_cursor_id == null) return null;
+  return { kind: "upvote", cursor_upvote_count: page.next_cursor_upvote_count ?? 0, cursor_id: page.next_cursor_id };
+}
+
+function latestCursorFrom(page: LatestPage): LatestCursor | null {
+  if (page.next_cursor_id == null || !page.next_cursor_created_at) return null;
+  return { kind: "latest", cursor_created_at: page.next_cursor_created_at, cursor_id: page.next_cursor_id };
+}
+
 export default function HomePage() {
+  const user = tokenStorage.getUser() as RegularUser | null;
+
+  const [composerOpen, setComposerOpen] = useState(false);
+  const [tab, setTab] = useState<Tab>("trending");
   const [feed, setFeed] = useState<Post[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [nextCursor, setNextCursor] = useState<NextCursor>(null);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [isFallback, setIsFallback] = useState(false);
-  const user = tokenStorage.getUser() as RegularUser | null;
 
-  async function loadFeed(p: number, replace = false) {
+  async function loadTab(t: Tab, cursor: NextCursor = null, replace = true) {
     try {
-      const data = await postsApi.getFeed(p);
-
-      if (replace && data.results.length === 0) {
-        // No followed posts — fall back to all ministers' posts
-        const allMinisters = await ministersApi.list();
-        const allPostArrays = await Promise.all(
-          allMinisters.map((m) => postsApi.getPostsByMinister(m.id).catch(() => [] as Post[]))
-        );
-        const allPosts = allPostArrays
-          .flat()
-          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-        setFeed(allPosts);
-        setHasMore(false);
-        setIsFallback(true);
+      if (t === "responded") {
+        if (replace) { setFeed([]); setNextCursor(null); }
         return;
       }
 
-      setFeed((prev) => (replace ? data.results : [...prev, ...data.results]));
-      setHasMore(data.next !== null);
-      setIsFallback(false);
+      if (t === "latest") {
+        const c = cursor?.kind === "latest" ? cursor : undefined;
+        const page = await postsApi.getLatest(c);
+        setIsFallback(false);
+        setFeed((prev) => (replace ? page.results : [...prev, ...page.results]));
+        setNextCursor(latestCursorFrom(page));
+        return;
+      }
+
+      // "all" or "trending" — both use upvote cursor
+      const c = cursor?.kind === "upvote" ? cursor : undefined;
+      let page: FeedPage;
+
+      if (t === "trending") {
+        page = await postsApi.getTrending(c);
+        setIsFallback(false);
+      } else {
+        // "all" feed
+        page = await postsApi.getFeed(c);
+
+        if (replace && page.results.length === 0 && !c) {
+          // Fallback: show posts from all ministers
+          const following = await getMyFollowing().catch(() => []);
+          if (following.length > 0) {
+            const ids = following.map((f) => f.minister.id);
+            const fallback = await postsApi.getPostsByMinisters(ids).catch(() => ({ results: [] as Post[], next_cursor_upvote_count: null, next_cursor_created_at: null, next_cursor_id: null }));
+            setFeed(fallback.results);
+            setNextCursor(null);
+            setIsFallback(true);
+            return;
+          }
+          setFeed([]);
+          setNextCursor(null);
+          setIsFallback(false);
+          return;
+        }
+
+        setIsFallback(false);
+      }
+
+      setFeed((prev) => (replace ? page.results : [...prev, ...page.results]));
+      setNextCursor(upvoteCursorFrom(page));
     } finally {
       setLoading(false);
       setLoadingMore(false);
     }
   }
 
-  useEffect(() => { loadFeed(1, true); }, []);
+  useEffect(() => {
+    setLoading(true);
+    setFeed([]);
+    setNextCursor(null);
+    setIsFallback(false);
+    loadTab(tab, null, true);
+  }, [tab]);
 
   function handlePostCreated(post: Post) {
-    setFeed((prev) => [post, ...prev]);
+    setComposerOpen(false);
+    if (tab === "all" || tab === "latest") {
+      setFeed((prev) => [post, ...prev]);
+    }
   }
 
   function handleDelete(id: number) {
     setFeed((prev) => prev.filter((p) => p.id !== id));
   }
 
-  function handleEdit(id: number, content: string) {
-    setFeed((prev) => prev.map((p) => (p.id === id ? { ...p, content } : p)));
+  function handleEdit(updatedPost: Post) {
+    setFeed((prev) => prev.map((p) => (p.id === updatedPost.id ? updatedPost : p)));
   }
 
   async function loadMore() {
+    if (!nextCursor || loadingMore) return;
     setLoadingMore(true);
-    const next = page + 1;
-    setPage(next);
-    await loadFeed(next);
+    await loadTab(tab, nextCursor, false);
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <PostComposer onPostCreated={handlePostCreated} />
-
-      {isFallback && (
-        <div className="text-xs text-gray-400 bg-gray-50 rounded-xl px-4 py-2 border border-gray-200">
-          You're not following anyone yet — showing all posts. Follow ministers to personalise your feed.
+      {/* Mini composer bar */}
+      {!composerOpen ? (
+        <div
+          className="bg-white rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3 cursor-pointer"
+          onClick={() => setComposerOpen(true)}
+        >
+          <AvatarCircle
+            avatar_url={user?.avatar_url ?? null}
+            username={user?.username ?? "?"}
+            size="sm"
+          />
+          <span className="flex-1 text-sm text-gray-400 select-none">
+            What issue matters to you today?
+          </span>
+          <button
+            onClick={(e) => { e.stopPropagation(); setComposerOpen(true); }}
+            className="bg-[#4F46E5] hover:bg-[#4338CA] text-white text-sm font-medium px-4 py-1.5 rounded-lg transition-colors"
+          >
+            Post
+          </button>
         </div>
+      ) : (
+        <PostComposer onPostCreated={handlePostCreated} />
       )}
 
-      {loading ? (
-        <Spinner />
-      ) : feed.length === 0 ? (
-        <p className="text-center text-gray-400 text-sm py-12">No posts yet. Be the first!</p>
-      ) : (
-        <>
-          {feed.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              currentUserId={user?.id ?? -1}
-              onDelete={handleDelete}
-              onEdit={handleEdit}
-            />
-          ))}
-          {hasMore && (
+      {/* Tab navigation + feed */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="flex gap-1 border-b border-gray-100 px-4">
+          {TABS.map((t) => (
             <button
-              onClick={loadMore}
-              disabled={loadingMore}
-              className="py-3 text-sm text-[#0169CC] hover:underline disabled:opacity-50"
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`py-3 px-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
+                tab === t.id ? "text-[#4F46E5]" : "text-gray-400 hover:text-gray-600"
+              }`}
             >
-              {loadingMore ? "Loading…" : "Load more"}
+              {t.label}
+              {tab === t.id && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#4F46E5] rounded-full" />
+              )}
             </button>
+          ))}
+        </div>
+
+        <div className="divide-y divide-gray-100">
+          {tab === "responded" ? (
+            <div className="flex flex-col items-center justify-center py-16 px-6 text-center gap-2">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <p className="text-sm text-gray-400 max-w-xs">
+                If a govt official replies to your post it will appear here
+              </p>
+            </div>
+          ) : loading ? (
+            <Spinner />
+          ) : feed.length === 0 ? (
+            <p className="text-center text-gray-400 text-sm py-12">No posts yet.</p>
+          ) : (
+            <>
+              {isFallback && (
+                <div className="px-4 py-2 text-xs text-gray-400 bg-gray-50">
+                  You're not following anyone yet — showing all posts.
+                </div>
+              )}
+              {feed.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  currentUserId={user?.id ?? -1}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                />
+              ))}
+              {nextCursor && (
+                <button
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="w-full py-3 text-sm text-[#4F46E5] hover:underline disabled:opacity-50"
+                >
+                  {loadingMore ? "Loading…" : "Load more"}
+                </button>
+              )}
+            </>
           )}
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -109,7 +223,7 @@ export default function HomePage() {
 function Spinner() {
   return (
     <div className="flex justify-center py-12">
-      <div className="w-6 h-6 border-2 border-[#0169CC] border-t-transparent rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
     </div>
   );
 }

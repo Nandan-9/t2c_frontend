@@ -1,10 +1,10 @@
 const COLORS = [
-  "bg-[#0169CC] text-white",
-  "bg-[#0158b0] text-white",
-  "bg-[#0147a0] text-white",
-  "bg-[#014890] text-white",
-  "bg-[#013a80] text-white",
-  "bg-[#012c70] text-white",
+  "bg-[#4F46E5] text-white",
+  "bg-[#4338CA] text-white",
+  "bg-[#3730A3] text-white",
+  "bg-[#312E81] text-white",
+  "bg-[#6366F1] text-white",
+  "bg-[#1E1B4B] text-white",
 ];
 
 function colorFor(username: string): string {

@@ -2,16 +2,17 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { ministers as ministersApi, followMinister, unfollowMinister, getMyFollowing } from "@/lib/api/ministers";
-import { AvatarCircle } from "@/components/ui/AvatarCircle";
-import { MinisterBadge } from "@/components/ui/MinisterBadge";
 import { useToast } from "@/hooks/useToast";
 import type { Minister, Follow } from "@/lib/api/types";
+
+const PAGE_SIZE = 12;
 
 export default function MinistersPage() {
   const { showToast } = useToast();
   const [allMinisters, setAllMinisters] = useState<Minister[]>([]);
   const [following, setFollowing] = useState<Follow[]>([]);
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,6 +26,7 @@ export default function MinistersPage() {
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
+    setPage(1);
     if (!q) return allMinisters;
     return allMinisters.filter(
       (m) =>
@@ -33,6 +35,9 @@ export default function MinistersPage() {
         m.tag.toLowerCase().includes(q),
     );
   }, [allMinisters, query]);
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   async function handleFollow(m: Minister) {
     const follow = await followMinister(m.id).catch(() => null);
@@ -48,52 +53,214 @@ export default function MinistersPage() {
   if (loading) return <Spinner />;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-lg font-semibold text-gray-800">Ministers</h1>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by name, dept, tag…"
-          className="border border-gray-300 rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-[#0169CC]/30 w-56"
-        />
+    <div className="flex flex-col gap-5">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#4F46E5]/10 flex items-center justify-center shrink-0 mt-0.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 22V8l9-6 9 6v14" /><path d="M9 22V12h6v10" /><path d="M3 8h18" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">Ministers</h1>
+            <p className="text-sm text-gray-500 mt-0.5">
+              Connect with Kerala's Ministers. Tag them in issues to get attention.
+            </p>
+          </div>
+        </div>
+
+        <div className="shrink-0 flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 max-w-xs">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mt-0.5">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <p className="text-xs text-amber-800 leading-relaxed">
+            Tag the right minister or department to ensure your issue reaches the right desk.
+          </p>
+        </div>
       </div>
 
-      {filtered.length === 0 ? (
+      {/* Stats bar */}
+      <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-5 py-3">
+        <div className="flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          <span className="text-sm font-semibold text-gray-800">{allMinisters.length} Ministers</span>
+          <span className="text-sm text-gray-400">· Working for Kerala</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+          <span>Tip: Tag relevant ministers in your posts for faster response</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Search */}
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search by name, department, or tag…"
+        className="border border-gray-300 rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-[#4F46E5]/30 w-full"
+      />
+
+      {/* Grid */}
+      {paginated.length === 0 ? (
         <p className="text-center text-gray-400 text-sm py-12">No ministers found.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {filtered.map((m) => {
-            const isFollowing = followingIds.has(m.id);
-            return (
-              <div key={m.id} className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col gap-3">
-                <div className="flex items-center gap-3">
-                  <AvatarCircle avatar_url={m.avatar_url} username={m.name} size="lg" />
-                  <div className="flex flex-col gap-0.5 min-w-0">
-                    <p className="text-sm font-semibold text-gray-800 truncate">{m.name}</p>
-                    <p className="text-xs text-gray-500 truncate">{m.dept}</p>
-                    <p className="text-xs text-gray-400 truncate">{m.constituency}</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <MinisterBadge tag={m.tag} name="" />
-                  <button
-                    onClick={() => isFollowing ? handleUnfollow(m.id) : handleFollow(m)}
-                    className={`text-xs rounded-full px-3 py-1.5 border transition-colors ${
-                      isFollowing
-                        ? "text-gray-600 border-gray-300 hover:bg-gray-50"
-                        : "text-white bg-[#0169CC] border-[#0169CC] hover:bg-[#0158b0]"
-                    }`}
-                  >
-                    {isFollowing ? "Unfollow" : "Follow"}
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {paginated.map((m) => (
+            <MinisterCard
+              key={m.id}
+              minister={m}
+              isFollowing={followingIds.has(m.id)}
+              onFollow={() => handleFollow(m)}
+              onUnfollow={() => handleUnfollow(m.id)}
+            />
+          ))}
         </div>
       )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <Pagination current={page} total={totalPages} onChange={setPage} />
+      )}
+    </div>
+  );
+}
+
+function MinisterCard({
+  minister: m,
+  isFollowing,
+  onFollow,
+  onUnfollow,
+}: {
+  minister: Minister;
+  isFollowing: boolean;
+  onFollow: () => void;
+  onUnfollow: () => void;
+}) {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 p-4 flex flex-col gap-3">
+      {/* Avatar + info */}
+      <div className="flex items-start gap-3">
+        <div className="relative shrink-0">
+          {m.avatar_url ? (
+            <img
+              src={m.avatar_url}
+              alt={m.name}
+              className="w-20 h-20 rounded-2xl object-cover"
+            />
+          ) : (
+            <div className="w-20 h-20 rounded-2xl bg-[#4F46E5]/10 flex items-center justify-center">
+              <span className="text-xl font-bold text-[#4F46E5]">
+                {m.name.slice(0, 2).toUpperCase()}
+              </span>
+            </div>
+          )}
+          {/* Verified badge */}
+          <div className="absolute bottom-1 right-1 w-5 h-5 bg-[#4F46E5] rounded-full flex items-center justify-center border-2 border-white">
+            <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
+              <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+          <p className="text-sm font-semibold text-gray-900 truncate">{m.name}</p>
+          <p className="text-xs text-gray-500 truncate">{m.dept}</p>
+          <p className="text-xs text-[#4F46E5] truncate">{m.tag}</p>
+        </div>
+      </div>
+
+      {/* Follow button */}
+      <button
+        onClick={isFollowing ? onUnfollow : onFollow}
+        className={`w-full py-1.5 rounded-lg text-sm font-medium transition-colors ${
+          isFollowing
+            ? "border border-gray-300 text-gray-600 hover:bg-gray-50"
+            : "bg-[#4F46E5] text-white hover:bg-[#4338CA]"
+        }`}
+      >
+        {isFollowing ? "Unfollow" : "Follow"}
+      </button>
+
+      {/* Divider + Total Tagged */}
+      <div className="border-t border-gray-100 pt-2 flex items-center gap-1.5">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+        </svg>
+        <span className="text-xs text-gray-400">
+          <span className="font-medium text-gray-600">{m.total_posts}</span> Total Tagged
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function Pagination({
+  current,
+  total,
+  onChange,
+}: {
+  current: number;
+  total: number;
+  onChange: (p: number) => void;
+}) {
+  const pages: (number | "…")[] = [];
+
+  if (total <= 5) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (current > 3) pages.push("…");
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+      pages.push(i);
+    }
+    if (current < total - 2) pages.push("…");
+    pages.push(total);
+  }
+
+  const btnBase = "px-3 py-1.5 rounded-lg text-sm transition-colors";
+  const active = `${btnBase} bg-[#4F46E5] text-white font-medium`;
+  const inactive = `${btnBase} text-gray-600 hover:bg-gray-100`;
+  const disabled = `${btnBase} text-gray-300 cursor-not-allowed`;
+
+  return (
+    <div className="flex items-center justify-center gap-1 pt-2">
+      <button
+        onClick={() => onChange(current - 1)}
+        disabled={current === 1}
+        className={current === 1 ? disabled : inactive}
+      >
+        ‹ Prev
+      </button>
+
+      {pages.map((p, i) =>
+        p === "…" ? (
+          <span key={`ellipsis-${i}`} className="px-2 text-gray-400 text-sm">
+            …
+          </span>
+        ) : (
+          <button
+            key={p}
+            onClick={() => onChange(p)}
+            className={p === current ? active : inactive}
+          >
+            {p}
+          </button>
+        ),
+      )}
+
+      <button
+        onClick={() => onChange(current + 1)}
+        disabled={current === total}
+        className={current === total ? disabled : inactive}
+      >
+        Next ›
+      </button>
     </div>
   );
 }
@@ -101,7 +268,7 @@ export default function MinistersPage() {
 function Spinner() {
   return (
     <div className="flex justify-center py-12">
-      <div className="w-6 h-6 border-2 border-[#0169CC] border-t-transparent rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
     </div>
   );
 }

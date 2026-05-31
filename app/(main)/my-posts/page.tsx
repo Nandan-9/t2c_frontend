@@ -14,7 +14,7 @@ export default function MyPostsPage() {
   useEffect(() => {
     if (!user) return;
     postsApi
-      .getFeed(1)
+      .getFeed()
       .then((data) => setMyPosts(data.results.filter((p) => p.author.id === user.id)))
       .finally(() => setLoading(false));
   }, []);
@@ -23,8 +23,8 @@ export default function MyPostsPage() {
     setMyPosts((prev) => prev.filter((p) => p.id !== id));
   }
 
-  function handleEdit(id: number, content: string) {
-    setMyPosts((prev) => prev.map((p) => p.id === id ? { ...p, content } : p));
+  function handleEdit(updatedPost: Post) {
+    setMyPosts((prev) => prev.map((p) => (p.id === updatedPost.id ? updatedPost : p)));
   }
 
   if (loading) return <Spinner />;
@@ -52,7 +52,7 @@ export default function MyPostsPage() {
 function Spinner() {
   return (
     <div className="flex justify-center py-12">
-      <div className="w-6 h-6 border-2 border-[#0169CC] border-t-transparent rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
     </div>
   );
 }

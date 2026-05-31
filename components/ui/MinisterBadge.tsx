@@ -5,7 +5,7 @@ interface Props {
 
 export function MinisterBadge({ tag, name }: Props) {
   return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#0169CC]/10 text-[#0169CC]">
+    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-[#4F46E5]/10 text-[#4F46E5]">
       {name}
       <span className="opacity-70">{tag}</span>
     </span>

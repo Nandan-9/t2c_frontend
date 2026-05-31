@@ -6,6 +6,8 @@ export interface Minister {
   avatar_url: string | null;
   tag: string;
   created_at: string;
+  total_posts: number;
+  departments: { id: number; name: string }[];
 }
 
 export interface CreateMinisterPayload {
@@ -39,4 +41,9 @@ export interface TagResult {
   id: number;
   name: string;
   tag: string;
+}
+
+export interface District {
+  id: number;
+  name: string;
 }

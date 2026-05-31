@@ -16,7 +16,7 @@ export function Toaster() {
         <div
           key={t.id}
           className={`px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white max-w-xs animate-in fade-in slide-in-from-top-2 ${
-            t.type === "success" ? "bg-[#0169CC]" : "bg-red-600"
+            t.type === "success" ? "bg-[#4F46E5]" : "bg-red-600"
           }`}
         >
           {t.message}

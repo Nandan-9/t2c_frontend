@@ -11,20 +11,23 @@ import { tokenStorage } from "@/lib/auth/tokens";
 import { userLogout } from "@/lib/auth/api";
 import { followMinister, unfollowMinister, getMyFollowing } from "@/lib/api/ministers";
 import { ministers as ministersApi } from "@/lib/api/ministers";
+import { getTopDepartments, type TopDepartment } from "@/lib/api/departments";
+import { posts as postsApi } from "@/lib/api/posts";
 import type { Minister, Follow } from "@/lib/api/types";
 import type { Post } from "@/lib/api/posts";
 import type { RegularUser } from "@/lib/auth/types";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const [showModal, setShowModal] = useState(false);
   const [lastPost, setLastPost] = useState<Post | null>(null);
 
   return (
     <UserAuthGuard>
-      <div className="font-[family-name:--font-poppins] min-h-screen bg-gray-50 flex">
+      <div className="font-[family-name:--font-poppins] min-h-screen bg-[#f5f5f0] flex">
         <Sidebar onNewPost={() => setShowModal(true)} />
         <main className="flex-1 flex justify-center px-4 py-6">
-          <div className="w-full max-w-[600px]">{children}</div>
+          <div className={`w-full ${pathname === "/ministers" ? "max-w-[900px]" : "max-w-[820px]"}`}>{children}</div>
         </main>
         <RightSidebar lastPost={lastPost} />
         {showModal && (
@@ -57,20 +60,20 @@ function Sidebar({ onNewPost }: { onNewPost: () => void }) {
   }
 
   return (
-    <aside className="w-[260px] shrink-0 flex flex-col h-screen sticky top-0 border-r border-gray-200 bg-white px-4 py-6 gap-6">
+    <aside className="w-70 shrink-0 flex flex-col h-screen sticky top-0 border-r border-gray-200 bg-white px-4 py-6 gap-6">
       <div className="flex items-center gap-2.5 px-2">
-        <div className="w-9 h-9 rounded-full bg-[#0169CC] flex items-center justify-center shrink-0">
+        <div className="w-9 h-9 rounded-full bg-[#4F46E5] flex items-center justify-center shrink-0">
           <span className="text-white font-bold text-sm">T</span>
         </div>
         <div>
-          <p className="font-bold text-[#0169CC] leading-tight">Talk2CM</p>
+          <p className="font-bold text-[#4F46E5] leading-tight">Talk2CM</p>
           <p className="text-xs text-gray-400">For the people</p>
         </div>
       </div>
 
       <button
         onClick={onNewPost}
-        className="bg-[#0169CC] text-white rounded-full px-5 py-2 text-sm font-medium hover:bg-[#0158b0] transition-colors"
+        className="bg-[#4F46E5] text-white rounded-full px-5 py-2 text-sm font-medium hover:bg-[#4338CA] transition-colors"
       >
         + New Post
       </button>
@@ -84,7 +87,7 @@ function Sidebar({ onNewPost }: { onNewPost: () => void }) {
               href={href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors border-l-2 ${
                 active
-                  ? "bg-[#0169CC]/10 text-[#0169CC] border-[#0169CC]"
+                  ? "bg-[#4F46E5]/10 text-[#4F46E5] border-[#4F46E5]"
                   : "text-gray-600 hover:bg-gray-50 border-transparent"
               }`}
             >
@@ -114,11 +117,18 @@ function Sidebar({ onNewPost }: { onNewPost: () => void }) {
 function RightSidebar({ lastPost }: { lastPost: Post | null }) {
   const [following, setFollowing] = useState<Follow[]>([]);
   const [allMinisters, setAllMinisters] = useState<Minister[]>([]);
+  const [topDepts, setTopDepts] = useState<TopDepartment[]>([]);
+  const [trending, setTrending] = useState<Post[]>([]);
 
   useEffect(() => {
     getMyFollowing().then(setFollowing).catch(() => {});
     ministersApi.list().then(setAllMinisters).catch(() => {});
   }, [lastPost]);
+
+  useEffect(() => {
+    getTopDepartments().then(setTopDepts).catch(() => {});
+    postsApi.getTrending().then((p) => setTrending(p.results.slice(0, 10))).catch(() => {});
+  }, []);
 
   const followingIds = new Set(following.map((f) => f.minister.id));
   const suggested = allMinisters.filter((m) => !followingIds.has(m.id)).slice(0, 3);
@@ -134,7 +144,68 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
   }
 
   return (
-    <aside className="w-[300px] shrink-0 h-screen sticky top-0 overflow-y-auto px-4 py-6 flex flex-col gap-6">
+    <aside className="w-90 shrink-0 h-screen sticky top-0 overflow-y-auto px-4 py-6 flex flex-col gap-6">
+      {trending.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-100">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Now trending in Kerala</p>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {trending.map((post, i) => (
+              <a
+                key={post.id}
+                href={`/posts/${post.id}`}
+                className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+              >
+                <span className="text-xs font-bold text-gray-300 mt-0.5 w-4 shrink-0">{i + 1}</span>
+                <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+                  <p className="text-xs font-medium text-gray-800 leading-snug line-clamp-2 group-hover:text-[#4F46E5] transition-colors">
+                    {post.heading}
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M12 19V5M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      {post.upvote_count}
+                    </span>
+                    <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      {post.comment_count ?? 0}
+                    </span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {topDepts.length > 0 && (
+        <Widget title="Most Tagged Depts">
+          {topDepts.slice(0, 6).map((d) => {
+            const max = topDepts[0]?.post_count || 1;
+            const pct = max > 0 ? Math.round((d.post_count / max) * 100) : 0;
+            return (
+              <div key={d.id} className="flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-gray-700 truncate">{d.name}</span>
+                  <span className="text-xs text-gray-400 shrink-0 ml-2">{d.post_count}</span>
+                </div>
+                <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#4F46E5] rounded-full transition-all"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </Widget>
+      )}
+
       <Widget title="Following">
         {following.length === 0 ? (
           <p className="text-xs text-gray-400">You're not following anyone yet.</p>
@@ -168,7 +239,7 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
               </div>
               <button
                 onClick={() => handleFollow(m)}
-                className="text-xs text-white bg-[#0169CC] rounded-full px-2.5 py-1 hover:bg-[#0158b0] shrink-0"
+                className="text-xs text-white bg-[#4F46E5] rounded-full px-2.5 py-1 hover:bg-[#4338CA] shrink-0"
               >
                 Follow
               </button>

@@ -2,17 +2,33 @@
 
 import { useEffect, useState } from "react";
 import { use } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { posts as postsApi, type Post } from "@/lib/api/posts";
 import { comments as commentsApi, type Comment } from "@/lib/api/comments";
 import { PostCard } from "@/components/ui/PostCard";
-import { AvatarCircle } from "@/components/ui/AvatarCircle";
-import { RelativeTime } from "@/components/ui/RelativeTime";
+import { CommentThread } from "@/components/ui/CommentThread";
 import { tokenStorage } from "@/lib/auth/tokens";
 import { useToast } from "@/hooks/useToast";
 import type { RegularUser } from "@/lib/auth/types";
 
+function insertReply(list: Comment[], parentId: number, reply: Comment): Comment[] {
+  return list.map((c) => {
+    if (c.id === parentId) return { ...c, replies: [...c.replies, reply] };
+    if (c.replies.length > 0) return { ...c, replies: insertReply(c.replies, parentId, reply) };
+    return c;
+  });
+}
+
+function removeComment(list: Comment[], id: number): Comment[] {
+  return list
+    .filter((c) => c.id !== id)
+    .map((c) => ({ ...c, replies: removeComment(c.replies, id) }));
+}
+
 export default function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const { showToast } = useToast();
   const [post, setPost] = useState<Post | null>(null);
   const [commentList, setCommentList] = useState<Comment[]>([]);
@@ -22,11 +38,12 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
   const user = tokenStorage.getUser() as RegularUser | null;
 
   useEffect(() => {
-    Promise.all([
-      postsApi.getPost(Number(id)),
-      commentsApi.getComments(Number(id)),
-    ])
-      .then(([p, c]) => { setPost(p); setCommentList(c); })
+    const postId = Number(id);
+    Promise.all([postsApi.getPost(postId), commentsApi.getComments(postId)])
+      .then(([detail, threadedComments]) => {
+        setPost(detail);
+        setCommentList(threadedComments);
+      })
       .catch(() => showToast("Failed to load post.", "error"))
       .finally(() => setLoading(false));
   }, [id]);
@@ -45,9 +62,12 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
     }
   }
 
-  async function handleDeleteComment(commentId: number) {
-    await commentsApi.deleteComment(Number(id), commentId).catch(() => {});
-    setCommentList((prev) => prev.filter((c) => c.id !== commentId));
+  function handleReplyAdded(parentId: number, reply: Comment) {
+    setCommentList((prev) => insertReply(prev, parentId, reply));
+  }
+
+  function handleDeleted(commentId: number) {
+    setCommentList((prev) => removeComment(prev, commentId));
   }
 
   if (loading) return <Spinner />;
@@ -55,10 +75,18 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div className="flex flex-col gap-4">
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#4F46E5] self-start -mb-1"
+      >
+        <ArrowLeft size={16} />
+        Back
+      </button>
+
       <PostCard
         post={post}
         currentUserId={user?.id ?? -1}
-        onEdit={(_, content) => setPost((p) => p ? { ...p, content } : p)}
+        onEdit={(updatedPost) => setPost(updatedPost)}
       />
 
       <div className="border-t border-gray-200 pt-4 flex flex-col gap-3">
@@ -67,41 +95,33 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
           onChange={(e) => setCommentText(e.target.value)}
           placeholder="Write a comment…"
           rows={3}
-          className="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-[#0169CC]/30 resize-none"
+          className="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-[#4F46E5]/30 resize-none"
         />
         <div className="flex justify-end">
           <button
             onClick={handleComment}
             disabled={!commentText.trim() || submitting}
-            className="px-4 py-2 bg-[#0169CC] text-white text-sm rounded-full disabled:opacity-50 hover:bg-[#0158b0]"
+            className="px-4 py-2 bg-[#4F46E5] text-white text-sm rounded-full disabled:opacity-50 hover:bg-[#4338CA]"
           >
             {submitting ? "Posting…" : "Comment"}
           </button>
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col divide-y divide-gray-100 bg-white rounded-xl border border-gray-200 px-4">
+        {commentList.length === 0 && (
+          <p className="text-sm text-gray-400 py-6 text-center">No comments yet.</p>
+        )}
         {commentList.map((c) => (
-          <div key={c.id} className="bg-white rounded-xl border border-gray-200 p-4 flex gap-3">
-            <AvatarCircle avatar_url={c.author.avatar_url} username={c.author.username} size="sm" />
-            <div className="flex-1 flex flex-col gap-1 min-w-0">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-800">{c.author.username}</span>
-                  <RelativeTime dateString={c.created_at} />
-                </div>
-                {c.author.id === (user?.id ?? -1) && (
-                  <button
-                    onClick={() => handleDeleteComment(c.id)}
-                    className="text-xs text-red-400 hover:text-red-600"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{c.content}</p>
-            </div>
-          </div>
+          <CommentThread
+            key={c.id}
+            comment={c}
+            postId={Number(id)}
+            depth={0}
+            currentUserId={user?.id ?? -1}
+            onReplyAdded={handleReplyAdded}
+            onDeleted={handleDeleted}
+          />
         ))}
       </div>
     </div>
@@ -111,7 +131,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
 function Spinner() {
   return (
     <div className="flex justify-center py-12">
-      <div className="w-6 h-6 border-2 border-[#0169CC] border-t-transparent rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
     </div>
   );
 }

@@ -53,10 +53,10 @@ export function MinisterSearchDropdown({ onSelect }: Props) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search ministers…"
-        className="border border-gray-300 rounded-full px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[#0169CC]/30 w-48"
+        className="border border-gray-300 rounded-full px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[#4F46E5]/30 w-48"
       />
       {loading && (
-        <div className="absolute right-3 top-2 w-4 h-4 border-2 border-[#0169CC] border-t-transparent rounded-full animate-spin" />
+        <div className="absolute right-3 top-2 w-4 h-4 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
       )}
       {open && results.length > 0 && (
         <ul className="absolute top-full mt-1 left-0 w-64 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
@@ -67,7 +67,7 @@ export function MinisterSearchDropdown({ onSelect }: Props) {
                 className="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex flex-col gap-0.5"
               >
                 <span className="text-sm font-medium text-gray-800">{m.name}</span>
-                <span className="text-xs text-[#0169CC]">{m.tag}</span>
+                <span className="text-xs text-[#4F46E5]">{m.tag}</span>
               </button>
             </li>
           ))}

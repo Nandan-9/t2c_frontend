@@ -16,7 +16,7 @@ export default function LoginPage() {
     <main className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white rounded-2xl shadow-md p-10 flex flex-col items-center gap-6 w-full max-w-sm">
         <div className="flex flex-col items-center gap-1">
-          <div className="w-12 h-12 rounded-full bg-[#0169CC] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-[#4F46E5] flex items-center justify-center">
             <span className="text-white font-bold text-lg">T</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">talk2CM</h1>

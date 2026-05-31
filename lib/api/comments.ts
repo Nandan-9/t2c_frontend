@@ -3,9 +3,10 @@ import type { PostAuthor } from "./posts";
 
 export interface Comment {
   id: number;
-  content: string;
   author: PostAuthor;
+  content: string;
   created_at: string;
+  replies: Comment[];
 }
 
 export const comments = {
@@ -13,8 +14,9 @@ export const comments = {
     return apiRequest("GET", `/posts/${postId}/comments/`);
   },
 
-  addComment(postId: number, content: string): Promise<Comment> {
-    return apiRequest("POST", `/posts/${postId}/comments/`, { body: { content } });
+  addComment(postId: number, content: string, parent_id?: number): Promise<Comment> {
+    const body = parent_id != null ? { content, parent_id } : { content };
+    return apiRequest("POST", `/posts/${postId}/comments/`, { body });
   },
 
   deleteComment(postId: number, commentId: number): Promise<void> {
