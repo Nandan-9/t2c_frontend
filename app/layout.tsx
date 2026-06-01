@@ -9,8 +9,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "talk2CM",
-  description: "talk2CM",
+  title: "keralamspeaks",
+  description: "keralamspeaks",
 };
 
 export default function RootLayout({

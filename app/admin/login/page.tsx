@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
       <div className="bg-white rounded-2xl shadow-md p-10 w-full max-w-sm flex flex-col gap-6">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold" style={{ color: "#0741E1" }}>
-            talk2CM
+            Keralam speaks
           </h1>
           <p className="text-sm text-gray-500">Admin portal</p>
         </div>

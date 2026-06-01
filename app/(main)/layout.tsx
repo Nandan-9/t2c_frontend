@@ -66,7 +66,7 @@ function Sidebar({ onNewPost }: { onNewPost: () => void }) {
           <span className="text-white font-bold text-sm">T</span>
         </div>
         <div>
-          <p className="font-bold text-[#4F46E5] leading-tight">Talk2CM</p>
+          <p className="font-bold text-[#4F46E5] leading-tight">Keralam speaks</p>
           <p className="text-xs text-gray-400">For the people</p>
         </div>
       </div>

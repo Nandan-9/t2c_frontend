@@ -32,7 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="w-56 bg-white border-r border-gray-200 flex flex-col">
         <div className="px-6 py-5 border-b border-gray-200">
           <span className="font-bold text-lg" style={{ color: "#0741E1" }}>
-            talk2CM
+            Keralam speaks
           </span>
           <p className="text-xs text-gray-400 mt-0.5">Admin</p>
         </div>
