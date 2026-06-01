@@ -21,6 +21,21 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const [showModal, setShowModal] = useState(false);
   const [lastPost, setLastPost] = useState<Post | null>(null);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const user = tokenStorage.getUser() as RegularUser | null;
+
+  useEffect(() => {
+    if (!user) return;
+    const key = `welcome_seen_${user.username}`;
+    if (!localStorage.getItem(key)) {
+      setShowWelcome(true);
+    }
+  }, []);
+
+  function dismissWelcome() {
+    if (user) localStorage.setItem(`welcome_seen_${user.username}`, "1");
+    setShowWelcome(false);
+  }
 
   return (
     <UserAuthGuard>
@@ -36,9 +51,34 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             onPostCreated={(p) => { setLastPost(p); setShowModal(false); }}
           />
         )}
+        {showWelcome && user && <WelcomeModal username={user.username} onDismiss={dismissWelcome} />}
         <Toaster />
       </div>
     </UserAuthGuard>
+  );
+}
+
+function WelcomeModal({ username, onDismiss }: { username: string; onDismiss: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full mx-4 p-8 flex flex-col gap-5">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-xl font-bold text-gray-900">Welcome, {username} 👋</h2>
+          <p className="text-sm text-gray-500 leading-relaxed">
+            You&apos;re one of the selected users with early access to our app.
+          </p>
+        </div>
+        <p className="text-sm text-gray-500 leading-relaxed">
+          This version is still being tested, so you may encounter occasional bugs or unfinished features. Your feedback helps us improve the experience before launch.
+        </p>
+        <button
+          onClick={onDismiss}
+          className="w-full bg-[#4F46E5] text-white rounded-full py-2.5 text-sm font-medium hover:bg-[#4338CA] transition-colors"
+        >
+          Got it
+        </button>
+      </div>
+    </div>
   );
 }
 
