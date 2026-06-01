@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { exchangeGoogleCode } from "@/lib/auth/api";
 import { tokenStorage } from "@/lib/auth/tokens";
@@ -8,7 +8,7 @@ import { ROUTES } from "@/lib/auth/config";
 
 type Status = "loading" | "error";
 
-export default function AuthCallbackPage() {
+function AuthCallbackInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<Status>("loading");
@@ -56,6 +56,23 @@ export default function AuthCallbackPage() {
         <p className="text-gray-500 text-sm">Signing you in…</p>
       </div>
     </main>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <Spinner />
+            <p className="text-gray-500 text-sm">Signing you in…</p>
+          </div>
+        </main>
+      }
+    >
+      <AuthCallbackInner />
+    </Suspense>
   );
 }
 
