@@ -13,9 +13,8 @@ type AvailabilityState = "idle" | "checking" | "available" | "taken" | "invalid"
 
 export default function SetupUsernamePage() {
   const router = useRouter();
-  const user = tokenStorage.getUser() as RegularUser | null;
 
-  const [value, setValue] = useState(user?.username ?? "");
+  const [value, setValue] = useState("");
   const [availability, setAvailability] = useState<AvailabilityState>("idle");
   const [submitError, setSubmitError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -25,7 +24,10 @@ export default function SetupUsernamePage() {
   useEffect(() => {
     if (!tokenStorage.isLoggedIn()) {
       router.replace(ROUTES.login);
+      return;
     }
+    const user = tokenStorage.getUser() as RegularUser | null;
+    if (user?.username) setValue(user.username);
   }, [router]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {

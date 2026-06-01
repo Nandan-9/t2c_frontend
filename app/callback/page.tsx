@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { googleLogin } from "@/lib/auth/api";
 
-export default function CallbackPage() {
+function CallbackInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState("");
@@ -44,5 +44,13 @@ export default function CallbackPage() {
         <p className="text-sm text-gray-500">Signing you in…</p>
       </div>
     </main>
+  );
+}
+
+export default function CallbackPage() {
+  return (
+    <Suspense>
+      <CallbackInner />
+    </Suspense>
   );
 }
