@@ -22,11 +22,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const [showModal, setShowModal] = useState(false);
   const [lastPost, setLastPost] = useState<Post | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
-  const user = tokenStorage.getUser() as RegularUser | null;
+  const [user, setUser] = useState<RegularUser | null>(null);
 
   useEffect(() => {
-    if (!user) return;
-    const key = `welcome_seen_${user.username}`;
+    const u = tokenStorage.getUser() as RegularUser | null;
+    setUser(u);
+    if (!u) return;
+    const key = `welcome_seen_${u.username}`;
     if (!localStorage.getItem(key)) {
       setShowWelcome(true);
     }
