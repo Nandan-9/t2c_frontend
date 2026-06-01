@@ -41,6 +41,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <NavLink href="/admin" label="Ministers" />
           <NavLink href="/admin/departments" label="Departments" />
           <NavLink href="/admin/districts" label="Districts" />
+          <NavLink href="/admin/report-issues" label="Report Issues" />
+          <NavLink href="/admin/reports" label="Reports" />
         </nav>
 
         <div className="px-3 py-4 border-t border-gray-200">

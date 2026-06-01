@@ -9,6 +9,7 @@ import { DepartmentBadge } from "./DepartmentBadge";
 import { MinisterBadge } from "./MinisterBadge";
 import { VoteButtons } from "./VoteButtons";
 import { useToast } from "@/hooks/useToast";
+import { ReportModal } from "./ReportModal";
 import type { Post } from "@/lib/api/posts";
 
 interface Props {
@@ -28,6 +29,7 @@ export function PostCard({ post, currentUserId, onDelete, onEdit }: Props) {
   const [editContent, setEditContent] = useState(post.content);
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -94,34 +96,43 @@ export function PostCard({ post, currentUserId, onDelete, onEdit }: Props) {
               </p>
             </div>
           </div>
-          {isAuthor && (
-            <div ref={menuRef} className="relative" onClick={(e) => e.stopPropagation()}>
-              <button
-                onClick={() => setMenuOpen((v) => !v)}
-                className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100 text-lg leading-none"
-              >
-                ⋯
-              </button>
-              {menuOpen && (
-                <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-200 rounded-xl shadow-lg z-10 overflow-hidden">
-                  {post.can_edit && (
+          <div ref={menuRef} className="relative" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setMenuOpen((v) => !v)}
+              className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100 text-lg leading-none"
+            >
+              ⋯
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-200 rounded-xl shadow-lg z-10 overflow-hidden">
+                {isAuthor ? (
+                  <>
+                    {post.can_edit && (
+                      <button
+                        onClick={() => { setEditing(true); setMenuOpen(false); }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Edit
+                      </button>
+                    )}
                     <button
-                      onClick={() => { setEditing(true); setMenuOpen(false); }}
-                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { setConfirmDelete(true); setMenuOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50"
                     >
-                      Edit
+                      Delete
                     </button>
-                  )}
+                  </>
+                ) : (
                   <button
-                    onClick={() => { setConfirmDelete(true); setMenuOpen(false); }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50"
+                    onClick={() => { setReportOpen(true); setMenuOpen(false); }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
                   >
-                    Delete
+                    Report
                   </button>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Content */}
@@ -243,6 +254,10 @@ export function PostCard({ post, currentUserId, onDelete, onEdit }: Props) {
           </button>
         </div>
       </div>
+
+      {reportOpen && (
+        <ReportModal postId={post.id} onClose={() => setReportOpen(false)} />
+      )}
 
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
