@@ -34,6 +34,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     }
   }, []);
 
+  
   function dismissWelcome() {
     if (user) localStorage.setItem(`welcome_seen_${user.username}`, "1");
     setShowWelcome(false);
