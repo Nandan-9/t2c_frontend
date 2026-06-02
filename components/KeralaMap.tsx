@@ -15,8 +15,8 @@ const GEOJSON_URLS: Record<string, string> = {
 
 type Level = "state" | "district" | "taluk";
 
-const INDIGO = "#4F46E5";
-const INDIGO_HOVER = "#4338CA";
+const INDIGO = "#C92A2A";
+const INDIGO_HOVER = "#a82323";
 
 function getNameFromProps(props: Record<string, string>): string {
   return props?.DISTRICT || props?.TALUK || props?.NAME_2 || props?.name || props?.district || props?.taluk || "";
@@ -141,7 +141,7 @@ export default function KeralaMap() {
         className="absolute inset-0 pointer-events-none z-10"
         style={{
           backgroundImage:
-            "repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(79,70,229,0.04) 59px, rgba(79,70,229,0.04) 60px), repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(79,70,229,0.04) 59px, rgba(79,70,229,0.04) 60px)",
+            "repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(201,42,42,0.04) 59px, rgba(201,42,42,0.04) 60px), repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(201,42,42,0.04) 59px, rgba(201,42,42,0.04) 60px)",
         }}
       />
 
@@ -192,7 +192,7 @@ export default function KeralaMap() {
                 <div key={opacity} className="flex items-center gap-2">
                   <div
                     className="w-4 h-4 rounded-sm border border-[#4F46E5]/30 shrink-0"
-                    style={{ background: `rgba(79,70,229,${opacity})` }}
+                    style={{ background: `rgba(201,42,42,${opacity})` }}
                   />
                   <span className="text-xs text-gray-600">{label}</span>
                 </div>

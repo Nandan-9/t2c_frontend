@@ -57,8 +57,8 @@ export default function MinistersPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#4F46E5]/10 flex items-center justify-center shrink-0 mt-0.5">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="w-10 h-10 rounded-xl bg-[#C92A2A]/10 flex items-center justify-center shrink-0 mt-0.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C92A2A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 22V8l9-6 9 6v14" /><path d="M9 22V12h6v10" /><path d="M3 8h18" />
             </svg>
           </div>
@@ -103,7 +103,7 @@ export default function MinistersPage() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search by name, department, or tag…"
-        className="border border-gray-300 rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-[#4F46E5]/30 w-full"
+        className="border border-gray-300 rounded px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-[#C92A2A]/30 w-full"
       />
 
       {/* Grid */}
@@ -154,14 +154,14 @@ function MinisterCard({
               className="w-20 h-20 rounded-2xl object-cover"
             />
           ) : (
-            <div className="w-20 h-20 rounded-2xl bg-[#4F46E5]/10 flex items-center justify-center">
-              <span className="text-xl font-bold text-[#4F46E5]">
+            <div className="w-20 h-20 rounded-2xl bg-[#C92A2A]/10 flex items-center justify-center">
+              <span className="text-xl font-bold text-[#C92A2A]">
                 {m.name.slice(0, 2).toUpperCase()}
               </span>
             </div>
           )}
           {/* Verified badge */}
-          <div className="absolute bottom-1 right-1 w-5 h-5 bg-[#4F46E5] rounded-full flex items-center justify-center border-2 border-white">
+          <div className="absolute bottom-1 right-1 w-5 h-5 bg-[#C92A2A] rounded-full flex items-center justify-center border-2 border-white">
             <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
               <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -171,7 +171,7 @@ function MinisterCard({
         <div className="flex flex-col gap-0.5 min-w-0 flex-1">
           <p className="text-sm font-semibold text-gray-900 truncate">{m.name}</p>
           <p className="text-xs text-gray-500 truncate">{m.dept}</p>
-          <p className="text-xs text-[#4F46E5] truncate">{m.tag}</p>
+          <p className="text-xs text-[#C92A2A] truncate">{m.tag}</p>
         </div>
       </div>
 
@@ -181,7 +181,7 @@ function MinisterCard({
         className={`w-full py-1.5 rounded-lg text-sm font-medium transition-colors ${
           isFollowing
             ? "border border-gray-300 text-gray-600 hover:bg-gray-50"
-            : "bg-[#4F46E5] text-white hover:bg-[#4338CA]"
+            : "bg-[#C92A2A] text-white hover:bg-[#a82323]"
         }`}
       >
         {isFollowing ? "Unfollow" : "Follow"}
@@ -224,7 +224,7 @@ function Pagination({
   }
 
   const btnBase = "px-3 py-1.5 rounded-lg text-sm transition-colors";
-  const active = `${btnBase} bg-[#4F46E5] text-white font-medium`;
+  const active = `${btnBase} bg-[#C92A2A] text-white font-medium`;
   const inactive = `${btnBase} text-gray-600 hover:bg-gray-100`;
   const disabled = `${btnBase} text-gray-300 cursor-not-allowed`;
 
@@ -268,7 +268,7 @@ function Pagination({
 function Spinner() {
   return (
     <div className="flex justify-center py-12">
-      <div className="w-6 h-6 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-[#C92A2A] border-t-transparent rounded-full animate-spin" />
     </div>
   );
 }

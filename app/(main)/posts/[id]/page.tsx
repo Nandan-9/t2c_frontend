@@ -77,7 +77,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
     <div className="flex flex-col gap-4">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#4F46E5] self-start -mb-1"
+        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#C92A2A] self-start -mb-1"
       >
         <ArrowLeft size={16} />
         Back
@@ -87,6 +87,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
         post={post}
         currentUserId={user?.id ?? -1}
         onEdit={(updatedPost) => setPost(updatedPost)}
+        detailView
       />
 
       <div className="border-t border-gray-200 pt-4 flex flex-col gap-3">
@@ -95,13 +96,13 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
           onChange={(e) => setCommentText(e.target.value)}
           placeholder="Write a comment…"
           rows={3}
-          className="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-[#4F46E5]/30 resize-none"
+          className="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-[#C92A2A]/30 resize-none"
         />
         <div className="flex justify-end">
           <button
             onClick={handleComment}
             disabled={!commentText.trim() || submitting}
-            className="px-4 py-2 bg-[#4F46E5] text-white text-sm rounded-full disabled:opacity-50 hover:bg-[#4338CA]"
+            className="px-4 py-2 bg-[#C92A2A] text-white text-sm rounded disabled:opacity-50 hover:bg-[#a82323]"
           >
             {submitting ? "Posting…" : "Comment"}
           </button>
@@ -131,7 +132,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
 function Spinner() {
   return (
     <div className="flex justify-center py-12">
-      <div className="w-6 h-6 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-[#C92A2A] border-t-transparent rounded-full animate-spin" />
     </div>
   );
 }

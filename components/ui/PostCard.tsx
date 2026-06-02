@@ -17,9 +17,10 @@ interface Props {
   currentUserId: number;
   onDelete?: (id: number) => void;
   onEdit?: (updatedPost: Post) => void;
+  detailView?: boolean;
 }
 
-export function PostCard({ post, currentUserId, onDelete, onEdit }: Props) {
+export function PostCard({ post, currentUserId, onDelete, onEdit, detailView }: Props) {
   const router = useRouter();
   const { showToast } = useToast();
   const isAuthor = post.author.id === currentUserId;
@@ -142,25 +143,25 @@ export function PostCard({ post, currentUserId, onDelete, onEdit }: Props) {
               value={editHeading}
               onChange={(e) => setEditHeading(e.target.value)}
               placeholder="Heading"
-              className="w-full border border-gray-200 rounded-lg p-2.5 text-base font-medium outline-none focus:ring-2 focus:ring-[#4F46E5]/30"
+              className="w-full border border-gray-200 rounded-lg p-2.5 text-base font-medium outline-none focus:ring-2 focus:ring-[#C92A2A]/30"
             />
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
               rows={4}
-              className="w-full border border-gray-200 rounded-lg p-2.5 text-base outline-none focus:ring-2 focus:ring-[#4F46E5]/30 resize-none"
+              className="w-full border border-gray-200 rounded-lg p-2.5 text-base outline-none focus:ring-2 focus:ring-[#C92A2A]/30 resize-none"
             />
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => { setEditing(false); setEditHeading(post.heading); setEditContent(post.content); }}
-                className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-full hover:bg-gray-50"
+                className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="px-4 py-2 text-sm text-white bg-[#4F46E5] rounded-full disabled:opacity-50 hover:bg-[#4338CA]"
+                className="px-4 py-2 text-sm text-white bg-[#C92A2A] rounded disabled:opacity-50 hover:bg-[#a82323]"
               >
                 {saving ? "Saving…" : "Save"}
               </button>
@@ -172,14 +173,26 @@ export function PostCard({ post, currentUserId, onDelete, onEdit }: Props) {
             <p className="text-base text-gray-700 line-clamp-3 whitespace-pre-wrap mb-4">{post.content}</p>
 
             {post.media_url && post.media_type === "image" && (
-              <div className="aspect-video rounded-xl overflow-hidden border border-gray-100 mb-4">
-                <img src={post.media_url} alt="" className="w-full h-full object-cover" />
-              </div>
+              detailView ? (
+                <div className="rounded-xl overflow-hidden border border-gray-100 mb-4">
+                  <img src={post.media_url} alt="" className="w-full h-auto" />
+                </div>
+              ) : (
+                <div className="aspect-video rounded-xl overflow-hidden border border-gray-100 mb-4">
+                  <img src={post.media_url} alt="" className="w-full h-full object-cover" />
+                </div>
+              )
             )}
             {post.media_url && post.media_type === "video" && (
-              <div className="aspect-video rounded-xl overflow-hidden border border-gray-100 mb-4">
-                <video src={post.media_url} controls className="w-full h-full object-cover" />
-              </div>
+              detailView ? (
+                <div className="rounded-xl overflow-hidden border border-gray-100 mb-4">
+                  <video src={post.media_url} controls className="w-full h-auto" />
+                </div>
+              ) : (
+                <div className="aspect-video rounded-xl overflow-hidden border border-gray-100 mb-4">
+                  <video src={post.media_url} controls className="w-full h-full object-cover" />
+                </div>
+              )
             )}
 
             {(post.department || post.minister || post.district) && (
@@ -244,8 +257,8 @@ export function PostCard({ post, currentUserId, onDelete, onEdit }: Props) {
               width="18"
               height="18"
               viewBox="0 0 24 24"
-              fill={bookmarked ? "#4F46E5" : "none"}
-              stroke={bookmarked ? "#4F46E5" : "currentColor"}
+              fill={bookmarked ? "#C92A2A" : "none"}
+              stroke={bookmarked ? "#C92A2A" : "currentColor"}
               strokeWidth="2"
               className={bookmarked ? "" : "text-gray-400 hover:text-gray-600"}
             >

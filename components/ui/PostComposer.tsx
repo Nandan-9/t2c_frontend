@@ -248,7 +248,7 @@ export function PostComposer({ onPostCreated }: Props) {
             <div ref={districtRef} className="relative">
               <button
                 onClick={() => { setDistrictOpen((v) => !v); setDistrictQuery(""); }}
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#4F46E5] bg-[#4F46E5]/8 hover:bg-[#4F46E5]/15 rounded-full px-3 py-1.5 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#C92A2A] bg-[#C92A2A]/8 hover:bg-[#C92A2A]/15 rounded px-3 py-1.5 transition-colors"
               >
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" strokeLinecap="round" strokeLinejoin="round" />
@@ -282,7 +282,7 @@ export function PostComposer({ onPostCreated }: Props) {
                           onClick={() => { setDistrict(d); setDistrictOpen(false); }}
                           className={`w-full text-left px-4 py-2.5 text-xs flex items-center gap-2.5 transition-colors ${
                             district?.id === d.id
-                              ? "text-[#4F46E5] bg-[#4F46E5]/8 font-medium"
+                              ? "text-[#C92A2A] bg-[#C92A2A]/8 font-medium"
                               : "text-gray-700 hover:bg-gray-50"
                           }`}
                         >
@@ -308,7 +308,7 @@ export function PostComposer({ onPostCreated }: Props) {
 
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="text-xs text-gray-500 border border-gray-300 rounded-full px-3 py-1 hover:bg-gray-50 transition-colors"
+              className="text-xs text-gray-500 border border-gray-300 rounded px-3 py-1 hover:bg-gray-50 transition-colors"
             >
               {mediaFile ? "Change media" : "Add media"}
             </button>
@@ -328,7 +328,7 @@ export function PostComposer({ onPostCreated }: Props) {
             <button
               onClick={handlePost}
               disabled={!heading.trim() || !content.trim() || loading || remaining < 0}
-              className="px-4 py-1.5 bg-[#4F46E5] text-white text-sm rounded-full disabled:opacity-50 hover:bg-[#4338CA] transition-colors"
+              className="px-4 py-1.5 bg-[#C92A2A] text-white text-sm rounded disabled:opacity-50 hover:bg-[#a82323] transition-colors"
             >
               {loading ? "Posting…" : "Post"}
             </button>

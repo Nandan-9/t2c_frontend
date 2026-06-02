@@ -100,7 +100,7 @@ export default function SetupUsernamePage() {
                 placeholder="e.g. john_doe"
                 maxLength={30}
                 autoFocus
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 pr-9 text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/40 focus:border-[#4F46E5]"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 pr-9 text-sm focus:outline-none focus:ring-2 focus:ring-[#C92A2A]/40 focus:border-[#C92A2A]"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-base leading-none">
                 <StatusIcon state={availability} />
@@ -117,7 +117,7 @@ export default function SetupUsernamePage() {
           <button
             type="submit"
             disabled={!canSubmit}
-            className="w-full bg-[#4F46E5] text-white rounded-full py-2.5 text-sm font-medium hover:bg-[#4338CA] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full bg-[#C92A2A] text-white rounded py-2.5 text-sm font-medium hover:bg-[#a82323] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {submitting ? "Saving…" : "Continue"}
           </button>

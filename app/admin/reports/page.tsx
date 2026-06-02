@@ -181,7 +181,7 @@ function ReportDetail({ postId, heading, onBack }: { postId: number; heading: st
                             className="w-7 h-7 rounded-full object-cover shrink-0"
                           />
                         ) : (
-                          <div className="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-semibold shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-[#C92A2A]/10 text-[#C92A2A] flex items-center justify-center text-xs font-semibold shrink-0">
                             {report.reporter.username[0].toUpperCase()}
                           </div>
                         )}

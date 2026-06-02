@@ -44,7 +44,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <div className="font-[family-name:--font-poppins] min-h-screen bg-[#f5f5f0] flex">
         <Sidebar onNewPost={() => setShowModal(true)} />
         <main className="flex-1 flex justify-center px-4 py-6">
-          <div className={`w-full ${pathname === "/ministers" ? "max-w-[900px]" : "max-w-[820px]"}`}>{children}</div>
+          <div className={`w-full ${pathname === "/ministers" ? "max-w-[1080px]" : "max-w-[980px]"}`}>{children}</div>
         </main>
         <RightSidebar lastPost={lastPost} />
         {showModal && (
@@ -75,7 +75,7 @@ function WelcomeModal({ username, onDismiss }: { username: string; onDismiss: ()
         </p>
         <button
           onClick={onDismiss}
-          className="w-full bg-[#4F46E5] text-white rounded-full py-2.5 text-sm font-medium hover:bg-[#4338CA] transition-colors"
+          className="w-full bg-[#C92A2A] text-white rounded py-2.5 text-sm font-medium hover:bg-[#a82323] transition-colors"
         >
           Got it
         </button>
@@ -102,20 +102,20 @@ function Sidebar({ onNewPost }: { onNewPost: () => void }) {
   }
 
   return (
-    <aside className="w-70 shrink-0 flex flex-col h-screen sticky top-0 border-r border-gray-200 bg-white px-4 py-6 gap-6">
+    <aside className="w-80 shrink-0 flex flex-col h-screen sticky top-0 border-r border-gray-200 bg-white px-4 py-6 gap-6">
       <div className="flex items-center gap-2.5 px-2">
-        <div className="w-9 h-9 rounded-full bg-[#4F46E5] flex items-center justify-center shrink-0">
+        <div className="w-9 h-9 rounded-full bg-[#C92A2A] flex items-center justify-center shrink-0">
           <span className="text-white font-bold text-sm">T</span>
         </div>
         <div>
-          <p className="font-bold text-[#4F46E5] leading-tight">Keralam speaks</p>
+          <p className="font-bold text-[#C92A2A] leading-tight">Keralam speaks</p>
           <p className="text-xs text-gray-400">For the people</p>
         </div>
       </div>
 
       <button
         onClick={onNewPost}
-        className="bg-[#4F46E5] text-white rounded-full px-5 py-2 text-sm font-medium hover:bg-[#4338CA] transition-colors"
+        className="bg-[#C92A2A] text-white rounded px-5 py-2 text-sm font-medium hover:bg-[#a82323] transition-colors"
       >
         + New Post
       </button>
@@ -127,9 +127,9 @@ function Sidebar({ onNewPost }: { onNewPost: () => void }) {
             <a
               key={href}
               href={href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors border-l-2 ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium transition-colors border-l-2 ${
                 active
-                  ? "bg-[#4F46E5]/10 text-[#4F46E5] border-[#4F46E5]"
+                  ? "bg-[#C92A2A]/10 text-[#C92A2A] border-[#C92A2A]"
                   : "text-gray-600 hover:bg-gray-50 border-transparent"
               }`}
             >
@@ -186,7 +186,7 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
   }
 
   return (
-    <aside className="w-90 shrink-0 h-screen sticky top-0 overflow-y-auto px-4 py-6 flex flex-col gap-6">
+    <aside className="w-104 shrink-0 h-screen sticky top-0 overflow-y-auto px-4 py-6 flex flex-col gap-6">
       {trending.length > 0 && (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-100">
@@ -201,7 +201,7 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
               >
                 <span className="text-xs font-bold text-gray-300 mt-0.5 w-4 shrink-0">{i + 1}</span>
                 <div className="flex flex-col gap-1.5 min-w-0 flex-1">
-                  <p className="text-xs font-medium text-gray-800 leading-snug line-clamp-2 group-hover:text-[#4F46E5] transition-colors">
+                  <p className="text-xs font-medium text-gray-800 leading-snug line-clamp-2 group-hover:text-[#C92A2A] transition-colors">
                     {post.heading}
                   </p>
                   <div className="flex items-center gap-3">
@@ -238,7 +238,7 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
                 </div>
                 <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#4F46E5] rounded-full transition-all"
+                    className="h-full bg-[#C92A2A] rounded-full transition-all"
                     style={{ width: `${pct}%` }}
                   />
                 </div>
@@ -260,7 +260,7 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
               </div>
               <button
                 onClick={() => handleUnfollow(f.minister.id)}
-                className="text-xs text-gray-500 border border-gray-300 rounded-full px-2.5 py-1 hover:bg-gray-50 shrink-0"
+                className="text-xs text-gray-500 border border-gray-300 rounded px-2.5 py-1 hover:bg-gray-50 shrink-0"
               >
                 Unfollow
               </button>
@@ -281,7 +281,7 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
               </div>
               <button
                 onClick={() => handleFollow(m)}
-                className="text-xs text-white bg-[#4F46E5] rounded-full px-2.5 py-1 hover:bg-[#4338CA] shrink-0"
+                className="text-xs text-white bg-[#C92A2A] rounded px-2.5 py-1 hover:bg-[#a82323] shrink-0"
               >
                 Follow
               </button>

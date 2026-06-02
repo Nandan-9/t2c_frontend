@@ -65,25 +65,25 @@ export function VoteButtons({ postId, upvote_count, downvote_count, user_vote, o
       <button
         onClick={() => handleVote("upvote")}
         className={`flex items-center gap-1.5 text-base transition-colors ${
-          userVote === "upvote" ? "text-[#4F46E5]" : "text-gray-400 hover:text-gray-600"
+          userVote === "upvote" ? "text-[#C92A2A]" : "text-gray-400 hover:text-gray-600"
         }`}
       >
         <svg width="19" height="19" viewBox="0 0 24 24" fill={userVote === "upvote" ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
           <path d="M12 19V5M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        <span className={userVote === "upvote" ? "text-[#4F46E5] font-medium" : ""}>{upvotes}</span>
+        <span className={userVote === "upvote" ? "text-[#C92A2A] font-medium" : ""}>{upvotes}</span>
       </button>
 
       <button
         onClick={() => handleVote("downvote")}
         className={`flex items-center gap-1.5 text-base transition-colors ${
-          userVote === "downvote" ? "text-[#4F46E5]" : "text-gray-400 hover:text-gray-600"
+          userVote === "downvote" ? "text-[#C92A2A]" : "text-gray-400 hover:text-gray-600"
         }`}
       >
         <svg width="19" height="19" viewBox="0 0 24 24" fill={userVote === "downvote" ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
           <path d="M12 5v14M19 12l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        <span className={userVote === "downvote" ? "text-[#4F46E5] font-medium" : ""}>{downvotes}</span>
+        <span className={userVote === "downvote" ? "text-[#C92A2A] font-medium" : ""}>{downvotes}</span>
       </button>
     </div>
   );

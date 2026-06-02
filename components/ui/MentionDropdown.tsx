@@ -133,7 +133,7 @@ export function MentionDropdown({ query, departments, onSelect, onClose }: Props
           </p>
           {loadingMinisters ? (
             <div className="px-4 py-3 flex justify-center">
-              <div className="w-4 h-4 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-[#C92A2A] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : (
             ministers.map((m, i) => (
@@ -145,7 +145,7 @@ export function MentionDropdown({ query, departments, onSelect, onClose }: Props
                 }`}
               >
                 <span className="text-sm font-medium text-gray-800">{m.name}</span>
-                <span className="text-xs text-[#4F46E5]">{m.tag}</span>
+                <span className="text-xs text-[#C92A2A]">{m.tag}</span>
               </button>
             ))
           )}
