@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { House, Users, Building2, FileText } from "lucide-react";
+import { House, Users, Building2, FileText, Bell, ChevronDown, LogOut } from "lucide-react";
+import Image from "next/image";
 import { UserAuthGuard } from "@/components/UserAuthGuard";
 import { NewPostModal } from "@/components/ui/NewPostModal";
 import { Toaster } from "@/components/ui/Toast";
 import { AvatarCircle } from "@/components/ui/AvatarCircle";
 import { tokenStorage } from "@/lib/auth/tokens";
 import { userLogout } from "@/lib/auth/api";
-import { followMinister, unfollowMinister, getMyFollowing } from "@/lib/api/ministers";
+import { followMinister,unfollowMinister, getMyFollowing } from "@/lib/api/ministers";
 import { ministers as ministersApi } from "@/lib/api/ministers";
 import { getTopDepartments, type TopDepartment } from "@/lib/api/departments";
 import { posts as postsApi } from "@/lib/api/posts";
@@ -34,7 +35,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     }
   }, []);
 
-  
   function dismissWelcome() {
     if (user) localStorage.setItem(`welcome_seen_${user.username}`, "1");
     setShowWelcome(false);
@@ -42,12 +42,15 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <UserAuthGuard>
-      <div className="font-[family-name:--font-poppins] min-h-screen bg-[#f5f5f0] flex">
-        <Sidebar onNewPost={() => setShowModal(true)} />
-        <main className="flex-1 flex justify-center px-4 py-6">
-          <div className={`w-full ${pathname === "/ministers" ? "max-w-[1080px]" : "max-w-[980px]"}`}>{children}</div>
-        </main>
-        <RightSidebar lastPost={lastPost} />
+      <div className="font-[family-name:--font-poppins] min-h-screen bg-[#f5f5f0] flex flex-col">
+        <Header user={user} />
+        <div className="flex flex-1">
+          <Sidebar onNewPost={() => setShowModal(true)} />
+          <main className="flex-1 flex justify-center px-4 py-6">
+            <div className={`w-full ${pathname === "/ministers" ? "max-w-[1080px]" : "max-w-[980px]"}`}>{children}</div>
+          </main>
+          <RightSidebar lastPost={lastPost} />
+        </div>
         {showModal && (
           <NewPostModal
             onClose={() => setShowModal(false)}
@@ -58,6 +61,84 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <Toaster />
       </div>
     </UserAuthGuard>
+  );
+}
+
+function Header({ user }: { user: RegularUser | null }) {
+  const router = useRouter();
+  const [showNotif, setShowNotif] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setShowNotif(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  async function handleLogout() {
+    await userLogout();
+    router.replace("/login");
+  }
+
+  return (
+    <header className="h-20 bg-white border-b border-gray-200 sticky top-0 z-50 flex items-center justify-between px-6 shrink-0">
+      {/* Logo */}
+      <div className="flex items-center gap-2.5">
+        <Image src="/logos/logo_1.svg" alt="Logo" width={96} height={48} className="object-contain" />
+      </div>
+
+      {/* Right side */}
+      <div className="flex items-center gap-3">
+        {/* Notifications */}
+        <div ref={notifRef} className="relative">
+          <button
+            onClick={() => setShowNotif((v) => !v)}
+            className="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 transition-colors"
+          >
+            <Bell size={20} />
+          </button>
+          {showNotif && (
+            <div className="absolute right-0 top-11 bg-white border border-gray-200 rounded-xl shadow-lg px-5 py-4 w-52 text-sm text-gray-500 text-center">
+              Coming soon
+            </div>
+          )}
+        </div>
+
+        {/* User menu */}
+        {user && (
+          <div ref={userMenuRef} className="relative">
+            <button
+              onClick={() => setShowUserMenu((v) => !v)}
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <AvatarCircle avatar_url={"avatar_url" in user ? user.avatar_url : null} username={user.username} size="sm" />
+              <span className="text-sm text-gray-700 font-medium max-w-30 truncate">{user.username}</span>
+              <ChevronDown size={15} className="text-gray-400 shrink-0" />
+            </button>
+            {showUserMenu && (
+              <div className="absolute right-0 top-11 bg-white border border-gray-200 rounded-xl shadow-lg py-1 w-44 z-50">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <LogOut size={15} className="text-gray-400" />
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </header>
   );
 }
 
@@ -86,9 +167,7 @@ function WelcomeModal({ username, onDismiss }: { username: string; onDismiss: ()
 }
 
 function Sidebar({ onNewPost }: { onNewPost: () => void }) {
-  const router = useRouter();
   const pathname = usePathname();
-  const user = tokenStorage.getUser() as RegularUser | null;
 
   const navItems = [
     { href: "/home", label: "Home", Icon: House },
@@ -97,23 +176,8 @@ function Sidebar({ onNewPost }: { onNewPost: () => void }) {
     { href: "/my-posts", label: "My Posts", Icon: FileText },
   ];
 
-  async function handleLogout() {
-    await userLogout();
-    router.replace("/login");
-  }
-
   return (
-    <aside className="w-80 shrink-0 flex flex-col h-screen sticky top-0 border-r border-gray-200 bg-white px-4 py-6 gap-6">
-      <div className="flex items-center gap-2.5 px-2">
-        <div className="w-9 h-9 rounded-full bg-[#C92A2A] flex items-center justify-center shrink-0">
-          <span className="text-white font-bold text-sm">T</span>
-        </div>
-        <div>
-          <p className="font-bold text-[#C92A2A] leading-tight">Keralam speaks</p>
-          <p className="text-xs text-gray-400">For the people</p>
-        </div>
-      </div>
-
+    <aside className="w-80 shrink-0 flex flex-col h-[calc(100vh-5rem)] sticky top-20 border-r border-gray-200 bg-white px-4 py-6 gap-6">
       <button
         onClick={onNewPost}
         className="bg-[#C92A2A] text-white rounded px-5 py-2 text-sm font-medium hover:bg-[#a82323] transition-colors"
@@ -140,19 +204,6 @@ function Sidebar({ onNewPost }: { onNewPost: () => void }) {
           );
         })}
       </nav>
-
-      {user && (
-        <div className="flex items-center gap-2 px-2">
-          <AvatarCircle avatar_url={"avatar_url" in user ? (user as RegularUser).avatar_url : null} username={user.username} size="sm" />
-          <p className="text-sm text-gray-700 truncate flex-1">{user.username}</p>
-          <button
-            onClick={handleLogout}
-            className="text-xs text-gray-400 hover:text-gray-600"
-          >
-            Out
-          </button>
-        </div>
-      )}
     </aside>
   );
 }
@@ -176,24 +227,19 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
   const followingIds = new Set(following.map((f) => f.minister.id));
   const suggested = allMinisters.filter((m) => !followingIds.has(m.id)).slice(0, 3);
 
-  async function handleUnfollow(id: number) {
-    await unfollowMinister(id).catch(() => {});
-    setFollowing((prev) => prev.filter((f) => f.minister.id !== id));
-  }
-
   async function handleFollow(m: Minister) {
     const follow = await followMinister(m.id).catch(() => null);
     if (follow) setFollowing((prev) => [...prev, follow]);
   }
 
   return (
-    <aside className="w-104 shrink-0 h-screen sticky top-0 overflow-y-auto px-4 py-6 flex flex-col gap-6">
+    <aside className="w-104 shrink-0 h-[calc(100vh-5rem)] sticky top-20 overflow-y-auto px-4 py-6 flex flex-col gap-6">
       {trending.length > 0 && (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-300">
             <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Now trending in Kerala</p>
           </div>
-          <div className="divide-y divide-gray-300">
+          <div className="divide-y divide-gray-300 max-h-80 overflow-y-auto">
             {trending.map((post, i) => (
               <a
                 key={post.id}
@@ -226,7 +272,8 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
         </div>
       )}
 
-      {/* {topDepts.length > 0 && (
+
+      {topDepts.length > 0 && (
         <Widget title="Most Tagged Depts">
           {topDepts.slice(0, 6).map((d) => {
             const max = topDepts[0]?.post_count || 1;
@@ -247,7 +294,7 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
             );
           })}
         </Widget>
-      )} */}
+      )} 
 
       {/* <Widget title="Following">
         {following.length === 0 ? (
@@ -268,9 +315,10 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
             </div>
           ))
         )}
-      </Widget> */}
+      </Widget>
 
-      <Widget title="Suggested Ministers">
+      <Widget title="Suggested
+      {/* <Widget title="Suggested Ministers">
         {suggested.length === 0 ? (
           <p className="text-xs text-gray-400">You're following everyone!</p>
         ) : (
@@ -289,7 +337,7 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
             </div>
           ))
         )}
-      </Widget>
+      </Widget> */}
     </aside>
   );
 }
