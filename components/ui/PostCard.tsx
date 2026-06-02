@@ -34,8 +34,8 @@ export function PostCard({ post, currentUserId, onDelete, onEdit, detailView }: 
   const [bookmarked, setBookmarked] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  console.log(post.heading)
 
-  console.log(post)
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -198,10 +198,14 @@ export function PostCard({ post, currentUserId, onDelete, onEdit, detailView }: 
               )
             )}
 
-            {(post.department || post.minister || post.district) && (
+            {(post.departments.length > 0 || post.ministers.length > 0 || post.district) && (
               <div className="flex items-center gap-2 flex-wrap">
-                {post.department && <DepartmentBadge name={post.department.name} />}
-                {post.minister && <MinisterBadge tag={post.minister.tag} name={post.minister.name} />}
+                {post.departments.map((dept) => (
+                  <DepartmentBadge key={dept.id} name={dept.name} />
+                ))}
+                {post.ministers.map((min) => (
+                  <MinisterBadge key={min.id} tag={min.tag} name={min.name} />
+                ))}
                 {post.district && (
                   <span className="inline-flex items-center gap-1.5 text-sm text-gray-500 bg-gray-100 rounded-full px-3 py-1">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

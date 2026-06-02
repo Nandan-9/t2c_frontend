@@ -22,8 +22,8 @@ export function PostComposer({ onPostCreated }: Props) {
   const { showToast } = useToast();
   const [heading, setHeading] = useState("");
   const [content, setContent] = useState("");
-  const [department, setDepartment] = useState<{ id: number; name: string } | null>(null);
-  const [minister, setMinister] = useState<TagResult | null>(null);
+  const [selectedDepartments, setSelectedDepartments] = useState<{ id: number; name: string }[]>([]);
+  const [selectedMinisters, setSelectedMinisters] = useState<TagResult[]>([]);
   const [district, setDistrict] = useState<District | null>(null);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
@@ -101,9 +101,13 @@ export function PostComposer({ onPostCreated }: Props) {
     setMentionQuery(null);
 
     if (type === "department") {
-      setDepartment({ id: item.id, name: item.name });
+      setSelectedDepartments((prev) =>
+        prev.some((d) => d.id === item.id) ? prev : [...prev, { id: item.id, name: item.name }],
+      );
     } else {
-      setMinister({ id: item.id, name: item.name, tag: item.tag! });
+      setSelectedMinisters((prev) =>
+        prev.some((m) => m.id === item.id) ? prev : [...prev, { id: item.id, name: item.name, tag: item.tag! }],
+      );
     }
 
     textareaRef.current?.focus();
@@ -131,16 +135,16 @@ export function PostComposer({ onPostCreated }: Props) {
       const post = await postsApi.createPost({
         heading: heading.trim(),
         content: content.trim(),
-        ...(department ? { department_id: department.id } : {}),
-        ...(minister ? { minister_id: minister.id } : {}),
+        ...(selectedDepartments.length > 0 ? { department_ids: selectedDepartments.map((d) => d.id) } : {}),
+        ...(selectedMinisters.length > 0 ? { minister_ids: selectedMinisters.map((m) => m.id) } : {}),
         ...(district ? { district_id: district.id } : {}),
         ...(media_key ? { media_key, media_type } : {}),
       });
 
       setHeading("");
       setContent("");
-      setDepartment(null);
-      setMinister(null);
+      setSelectedDepartments([]);
+      setSelectedMinisters([]);
       setDistrict(null);
       setMentionQuery(null);
       removeMedia();
@@ -205,28 +209,28 @@ export function PostComposer({ onPostCreated }: Props) {
       {expanded && (
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-wrap">
-            {department && (
-              <div className="flex items-center gap-1">
-                <DepartmentBadge name={department.name} />
+            {selectedDepartments.map((dept) => (
+              <div key={dept.id} className="flex items-center gap-1">
+                <DepartmentBadge name={dept.name} />
                 <button
-                  onClick={() => setDepartment(null)}
+                  onClick={() => setSelectedDepartments((prev) => prev.filter((d) => d.id !== dept.id))}
                   className="text-gray-400 hover:text-gray-600 text-xs"
                 >
                   ×
                 </button>
               </div>
-            )}
-            {minister && (
-              <div className="flex items-center gap-1">
-                <MinisterBadge tag={minister.tag} name={minister.name} />
+            ))}
+            {selectedMinisters.map((min) => (
+              <div key={min.id} className="flex items-center gap-1">
+                <MinisterBadge tag={min.tag} name={min.name} />
                 <button
-                  onClick={() => setMinister(null)}
+                  onClick={() => setSelectedMinisters((prev) => prev.filter((m) => m.id !== min.id))}
                   className="text-gray-400 hover:text-gray-600 text-xs"
                 >
                   ×
                 </button>
               </div>
-            )}
+            ))}
             {district && (
               <div className="flex items-center gap-1">
                 <span className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-100 rounded-full px-2.5 py-1">

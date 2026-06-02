@@ -19,8 +19,8 @@ export interface Post {
   heading: string;
   content: string;
   author: PostAuthor;
-  department: { id: number; name: string } | null;
-  minister: Minister | null;
+  departments: { id: number; name: string }[];
+  ministers: Minister[];
   district: { id: number; name: string } | null;
   status: "published" | "archived" | "draft" | "deleted";
   media_url: string | null;
@@ -122,8 +122,8 @@ export const posts = {
   createPost(params: {
     heading: string;
     content: string;
-    department_id?: number;
-    minister_id?: number;
+    department_ids?: number[];
+    minister_ids?: number[];
     district_id?: number;
     media_key?: string;
     media_type?: "image" | "video";
