@@ -34,6 +34,9 @@ export function PostCard({ post, currentUserId, onDelete, onEdit, detailView }: 
   const [bookmarked, setBookmarked] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+
+  console.log(post)
+
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
@@ -174,12 +177,12 @@ export function PostCard({ post, currentUserId, onDelete, onEdit, detailView }: 
 
             {post.media_url && post.media_type === "image" && (
               detailView ? (
-                <div className="rounded-xl overflow-hidden border border-gray-100 mb-4">
-                  <img src={post.media_url} alt="" className="w-full h-auto" />
+                <div className="aspect-video rounded-xl overflow-hidden border border-gray-100 mb-4 bg-gray-50 flex items-center justify-center">
+                  <img src={post.media_url} alt="" className="max-w-full max-h-full object-contain" />
                 </div>
               ) : (
-                <div className="aspect-video rounded-xl overflow-hidden border border-gray-100 mb-4">
-                  <img src={post.media_url} alt="" className="w-full h-full object-cover" />
+                <div className="aspect-video rounded-xl overflow-hidden border border-gray-100 mb-4 bg-gray-50 flex items-center justify-center">
+                  <img src={post.media_url} alt="" className="max-w-full max-h-full object-contain" />
                 </div>
               )
             )}
