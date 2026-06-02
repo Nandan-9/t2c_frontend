@@ -196,7 +196,7 @@ export function PostCard({ post, currentUserId, onDelete, onEdit, detailView }: 
               )
             )}
 
-            {(post.departments.length > 0 || post.ministers.length > 0 || post.district) && (
+            {((post.departments?.length ?? 0) > 0 || (post.ministers?.length ?? 0) > 0 || post.district) && (
               <div className="flex items-center gap-2 flex-wrap">
                 {post.departments.map((dept) => (
                   <DepartmentBadge key={dept.id} name={dept.name} />

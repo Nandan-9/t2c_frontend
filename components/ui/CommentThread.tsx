@@ -118,7 +118,7 @@ export function CommentThread({
         </div>
       </div>
 
-      {comment.replies.length > 0 && (
+      {(comment.replies?.length ?? 0) > 0 && (
         <div>
           {comment.replies.map((reply) => (
             <CommentThread
