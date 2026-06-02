@@ -88,7 +88,7 @@ export default function FollowingPage() {
         </p>
         <a
           href="/ministers"
-          className="mt-1 text-sm text-[#4F46E5] font-medium hover:underline"
+          className="mt-1 text-sm text-[#C92A2A] font-medium hover:underline"
         >
           Browse ministers →
         </a>
@@ -148,7 +148,7 @@ export default function FollowingPage() {
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="w-full py-3 text-sm text-[#4F46E5] hover:underline disabled:opacity-50"
+                  className="w-full py-3 text-sm text-[#C92A2A] hover:underline disabled:opacity-50"
                 >
                   {loadingMore ? "Loading…" : "Load more"}
                 </button>
@@ -164,7 +164,7 @@ export default function FollowingPage() {
 function Spinner() {
   return (
     <div className="flex justify-center py-12">
-      <div className="w-6 h-6 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-[#C92A2A] border-t-transparent rounded-full animate-spin" />
     </div>
   );
 }

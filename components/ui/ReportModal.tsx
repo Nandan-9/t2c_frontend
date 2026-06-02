@@ -82,13 +82,13 @@ export function ReportModal({ postId, onClose }: Props) {
           value={text}
           onChange={(e) => handleTextChange(e.target.value)}
           placeholder="Describe the issue…"
-          className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:border-[#4F46E5]"
+          className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#C92A2A]/30 focus:border-[#C92A2A]"
           autoFocus
         />
 
         {loading ? (
           <div className="flex justify-center py-2">
-            <svg className="animate-spin h-5 w-5 text-[#4F46E5]" fill="none" viewBox="0 0 24 24">
+            <svg className="animate-spin h-5 w-5 text-[#C92A2A]" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4z" />
             </svg>
@@ -99,10 +99,10 @@ export function ReportModal({ postId, onClose }: Props) {
               <button
                 key={issue.id}
                 onClick={() => handleChip(issue)}
-                className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                className={`px-3 py-1.5 rounded text-sm border transition-colors ${
                   selectedIssue?.id === issue.id
-                    ? "bg-[#4F46E5] text-white border-[#4F46E5]"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-[#4F46E5] hover:text-[#4F46E5]"
+                    ? "bg-[#C92A2A] text-white border-[#C92A2A]"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-[#C92A2A] hover:text-[#C92A2A]"
                 }`}
               >
                 {issue.name}
@@ -127,7 +127,7 @@ export function ReportModal({ postId, onClose }: Props) {
           <button
             onClick={handleSubmit}
             disabled={!text.trim() || submitting}
-            className="px-4 py-2 text-sm text-white bg-[#4F46E5] rounded-lg hover:bg-[#4338CA] disabled:opacity-40 transition-colors"
+            className="px-4 py-2 text-sm text-white bg-[#C92A2A] rounded-lg hover:bg-[#a82323] disabled:opacity-40 transition-colors"
           >
             {submitting ? "Submitting…" : "Submit report"}
           </button>

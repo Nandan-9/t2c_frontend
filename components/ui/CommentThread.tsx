@@ -72,7 +72,7 @@ export function CommentThread({
               {depth < 3 && (
                 <button
                   onClick={() => setReplyOpen((v) => !v)}
-                  className="text-xs text-[#4F46E5] hover:text-[#4338CA]"
+                  className="text-xs text-[#C92A2A] hover:text-[#a82323]"
                 >
                   Reply
                 </button>
@@ -96,7 +96,7 @@ export function CommentThread({
                 onChange={(e) => setReplyText(e.target.value)}
                 placeholder={`Reply to ${comment.author.username}…`}
                 rows={2}
-                className="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-[#4F46E5]/30 resize-none"
+                className="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-[#C92A2A]/30 resize-none"
               />
               <div className="flex justify-end gap-2">
                 <button
@@ -108,7 +108,7 @@ export function CommentThread({
                 <button
                   onClick={handleReply}
                   disabled={!replyText.trim() || submitting}
-                  className="px-4 py-1.5 bg-[#4F46E5] text-white text-xs rounded-full disabled:opacity-50 hover:bg-[#4338CA]"
+                  className="px-4 py-1.5 bg-[#C92A2A] text-white text-xs rounded disabled:opacity-50 hover:bg-[#a82323]"
                 >
                   {submitting ? "Posting…" : "Reply"}
                 </button>

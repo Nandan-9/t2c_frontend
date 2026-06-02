@@ -40,7 +40,7 @@ function CallbackInner() {
   return (
     <main className="min-h-screen flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#C92A2A] border-t-transparent rounded-full animate-spin" />
         <p className="text-sm text-gray-500">Signing you in…</p>
       </div>
     </main>

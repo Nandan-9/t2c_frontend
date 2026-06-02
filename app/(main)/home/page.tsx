@@ -145,7 +145,7 @@ export default function HomePage() {
           </span>
           <button
             onClick={(e) => { e.stopPropagation(); setComposerOpen(true); }}
-            className="bg-[#4F46E5] hover:bg-[#4338CA] text-white text-sm font-medium px-4 py-1.5 rounded-lg transition-colors"
+            className="bg-[#C92A2A] hover:bg-[#a82323] text-white text-sm font-medium px-4 py-1.5 rounded-lg transition-colors"
           >
             Post
           </button>
@@ -162,12 +162,12 @@ export default function HomePage() {
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`py-3 px-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
-                tab === t.id ? "text-[#4F46E5]" : "text-gray-400 hover:text-gray-600"
+                tab === t.id ? "text-[#C92A2A]" : "text-gray-400 hover:text-gray-600"
               }`}
             >
               {t.label}
               {tab === t.id && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#4F46E5] rounded-full" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C92A2A] rounded-full" />
               )}
             </button>
           ))}
@@ -207,7 +207,7 @@ export default function HomePage() {
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="w-full py-3 text-sm text-[#4F46E5] hover:underline disabled:opacity-50"
+                  className="w-full py-3 text-sm text-[#C92A2A] hover:underline disabled:opacity-50"
                 >
                   {loadingMore ? "Loading…" : "Load more"}
                 </button>
@@ -223,7 +223,7 @@ export default function HomePage() {
 function Spinner() {
   return (
     <div className="flex justify-center py-12">
-      <div className="w-6 h-6 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-[#C92A2A] border-t-transparent rounded-full animate-spin" />
     </div>
   );
 }
