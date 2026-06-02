@@ -52,7 +52,7 @@ export function CommentThread({
     }
   }
 
-  const indentClass = depth > 0 ? "ml-8 border-l-2 border-gray-100 pl-4" : "";
+  const indentClass = depth > 0 ? "ml-8 border-l-2 border-red-300 pl-4" : "";
 
   return (
     <div className={indentClass}>

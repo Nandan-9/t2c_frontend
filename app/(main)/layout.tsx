@@ -190,19 +190,19 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
     <aside className="w-104 shrink-0 h-screen sticky top-0 overflow-y-auto px-4 py-6 flex flex-col gap-6">
       {trending.length > 0 && (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Now trending in Kerala</p>
+          <div className="px-4 py-3 border-b border-gray-300">
+            <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Now trending in Kerala</p>
           </div>
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gray-300">
             {trending.map((post, i) => (
               <a
                 key={post.id}
                 href={`/posts/${post.id}`}
                 className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
               >
-                <span className="text-xs font-bold text-gray-300 mt-0.5 w-4 shrink-0">{i + 1}</span>
+                <span className="text-xs font-bold text-gray-400 mt-0.5 w-4 shrink-0">{i + 1}</span>
                 <div className="flex flex-col gap-1.5 min-w-0 flex-1">
-                  <p className="text-xs font-medium text-gray-800 leading-snug line-clamp-2 group-hover:text-[#C92A2A] transition-colors">
+                  <p className="text-[13px] font-semibold text-gray-900 leading-snug line-clamp-2 group-hover:text-[#C92A2A] transition-colors">
                     {post.heading}
                   </p>
                   <div className="flex items-center gap-3">
@@ -226,7 +226,7 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
         </div>
       )}
 
-      {topDepts.length > 0 && (
+      {/* {topDepts.length > 0 && (
         <Widget title="Most Tagged Depts">
           {topDepts.slice(0, 6).map((d) => {
             const max = topDepts[0]?.post_count || 1;
@@ -247,9 +247,9 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
             );
           })}
         </Widget>
-      )}
+      )} */}
 
-      <Widget title="Following">
+      {/* <Widget title="Following">
         {following.length === 0 ? (
           <p className="text-xs text-gray-400">You're not following anyone yet.</p>
         ) : (
@@ -268,7 +268,7 @@ function RightSidebar({ lastPost }: { lastPost: Post | null }) {
             </div>
           ))
         )}
-      </Widget>
+      </Widget> */}
 
       <Widget title="Suggested Ministers">
         {suggested.length === 0 ? (

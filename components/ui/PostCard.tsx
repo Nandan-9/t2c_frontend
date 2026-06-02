@@ -253,7 +253,7 @@ export function PostCard({ post, currentUserId, onDelete, onEdit, detailView }: 
               <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
             </svg>
           </button>
-          <button
+          {/* <button
             onClick={(e) => { e.stopPropagation(); setBookmarked((v) => !v); }}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             title="Bookmark"
@@ -269,7 +269,7 @@ export function PostCard({ post, currentUserId, onDelete, onEdit, detailView }: 
             >
               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-          </button>
+          </button> */}
         </div>
       </div>
 
