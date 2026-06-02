@@ -35,6 +35,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
   const [commentText, setCommentText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [commentFocused, setCommentFocused] = useState(false);
   const user = tokenStorage.getUser() as RegularUser | null;
 
   useEffect(() => {
@@ -55,6 +56,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
       const c = await commentsApi.addComment(Number(id), commentText.trim());
       setCommentList((prev) => [...prev, c]);
       setCommentText("");
+      setCommentFocused(false);
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Failed to comment.", "error");
     } finally {
@@ -90,23 +92,33 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
         detailView
       />
 
-      <div className="border-t border-gray-200 pt-4 flex flex-col gap-3">
+      <div className="border-t border-gray-200 pt-4 flex flex-col gap-2">
         <textarea
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
+          onFocus={() => setCommentFocused(true)}
+          onBlur={() => { if (!commentText.trim()) setCommentFocused(false); }}
           placeholder="Write a comment…"
-          rows={3}
-          className="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-[#C92A2A]/30 resize-none"
+          rows={commentFocused ? 3 : 1}
+          className="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-[#C92A2A]/30 resize-none transition-all"
         />
-        <div className="flex justify-end">
-          <button
-            onClick={handleComment}
-            disabled={!commentText.trim() || submitting}
-            className="px-4 py-2 bg-[#C92A2A] text-white text-sm rounded disabled:opacity-50 hover:bg-[#a82323]"
-          >
-            {submitting ? "Posting…" : "Comment"}
-          </button>
-        </div>
+        {commentFocused && (
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => { setCommentText(""); setCommentFocused(false); }}
+              className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleComment}
+              disabled={!commentText.trim() || submitting}
+              className="px-4 py-2 bg-[#C92A2A] text-white text-sm rounded-lg disabled:opacity-50 hover:bg-[#a82323]"
+            >
+              {submitting ? "Posting…" : "Comment"}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col divide-y divide-gray-100 bg-white rounded-xl border border-gray-200 px-4">
