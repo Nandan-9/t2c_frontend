@@ -17,9 +17,13 @@ import { posts as postsApi } from "@/lib/api/posts";
 import type { Minister, Follow } from "@/lib/api/types";
 import type { Post } from "@/lib/api/posts";
 import type { RegularUser } from "@/lib/auth/types";
+import { MobileHeader } from "@/components/mobile/MobileHeader";
+import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
+import { MobileFAB } from "@/components/mobile/MobileFAB";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [lastPost, setLastPost] = useState<Post | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -40,17 +44,45 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     setShowWelcome(false);
   }
 
+  async function handleLogout() {
+    await userLogout();
+    router.replace("/login");
+  }
+
   return (
     <UserAuthGuard>
-      <div className="font-[family-name:--font-poppins] min-h-screen bg-[#f5f5f0] flex flex-col">
-        <Header user={user} />
-        <div className="flex flex-1">
-          <Sidebar onNewPost={() => setShowModal(true)} />
-          <main className="flex-1 flex justify-center px-4 py-6">
-            <div className={`w-full ${pathname === "/ministers" ? "max-w-[1080px]" : "max-w-[980px]"}`}>{children}</div>
+      <div className="font-[family-name:--font-poppins] min-h-screen bg-[#f5f5f0] flex flex-col overflow-x-clip">
+        {/* Headers — direct flex children so sticky works correctly */}
+        <Header user={user} onLogout={handleLogout} className="hidden md:flex" />
+        <MobileHeader user={user} onLogout={handleLogout} className="md:hidden" />
+
+        <div className="flex flex-1 min-w-0">
+          {/* Desktop sidebar */}
+          <div className="hidden md:flex">
+            <Sidebar onNewPost={() => setShowModal(true)} />
+          </div>
+
+          <main className="flex-1 min-w-0 flex justify-center px-4 py-6 pb-24 md:pb-6">
+            <div className={`w-full min-w-0 ${pathname === "/ministers" ? "max-w-[1080px]" : "max-w-[980px]"}`}>{children}</div>
           </main>
-          <RightSidebar lastPost={lastPost} />
+
+          {/* Desktop right sidebar */}
+          <div className="hidden md:block">
+            <RightSidebar lastPost={lastPost} />
+          </div>
         </div>
+
+        {/* Mobile FAB — home only */}
+        {pathname === "/home" && (
+          <div className="md:hidden">
+            <MobileFAB onClick={() => setShowModal(true)} />
+          </div>
+        )}
+        {/* Mobile bottom nav */}
+        <div className="md:hidden">
+          <MobileBottomNav />
+        </div>
+
         {showModal && (
           <NewPostModal
             onClose={() => setShowModal(false)}
@@ -64,8 +96,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   );
 }
 
-function Header({ user }: { user: RegularUser | null }) {
-  const router = useRouter();
+function Header({ user, onLogout, className }: { user: RegularUser | null; onLogout: () => void; className?: string }) {
   const [showNotif, setShowNotif] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -84,13 +115,8 @@ function Header({ user }: { user: RegularUser | null }) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  async function handleLogout() {
-    await userLogout();
-    router.replace("/login");
-  }
-
   return (
-    <header className="h-20 bg-white border-b border-gray-200 sticky top-0 z-50 flex items-center justify-between px-6 shrink-0">
+    <header className={`h-20 bg-white border-b border-gray-200 sticky top-0 z-50 flex items-center justify-between px-6 shrink-0 ${className ?? ""}`}>
       {/* Logo */}
       <div className="flex items-center gap-2.5">
         <Image src="/logos/logo_1.svg" alt="Logo" width={96} height={48} className="object-contain" />
@@ -127,7 +153,7 @@ function Header({ user }: { user: RegularUser | null }) {
             {showUserMenu && (
               <div className="absolute right-0 top-11 bg-white border border-gray-200 rounded-xl shadow-lg py-1 w-44 z-50">
                 <button
-                  onClick={handleLogout}
+                  onClick={onLogout}
                   className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   <LogOut size={15} className="text-gray-400" />
