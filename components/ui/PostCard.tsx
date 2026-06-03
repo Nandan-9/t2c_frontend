@@ -171,7 +171,7 @@ export function PostCard({ post, currentUserId, onDelete, onEdit, detailView }: 
         ) : (
           <>
             <h2 className="text-xl font-bold text-gray-900 mb-1.5 leading-snug">{post.heading}</h2>
-            <p className="text-base text-gray-700 line-clamp-3 whitespace-pre-wrap mb-4">{post.content}</p>
+            <p className="text-base text-gray-700 whitespace-pre-wrap mb-4">{post.content}</p>
 
             {post.media_url && post.media_type === "image" && (
               detailView ? (
