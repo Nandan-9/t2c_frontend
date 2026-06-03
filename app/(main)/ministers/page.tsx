@@ -55,7 +55,7 @@ export default function MinistersPage() {
   return (
     <div className="flex flex-col gap-5">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-4">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#C92A2A]/10 flex items-center justify-center shrink-0 mt-0.5">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C92A2A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -70,7 +70,7 @@ export default function MinistersPage() {
           </div>
         </div>
 
-        <div className="shrink-0 flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 max-w-xs">
+        <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 md:shrink-0 md:max-w-xs">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mt-0.5">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
           </svg>
@@ -82,14 +82,14 @@ export default function MinistersPage() {
 
       {/* Stats bar */}
       <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-5 py-3">
-        <div className="flex items-center gap-2">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div className="flex items-center gap-2 min-w-0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
           </svg>
-          <span className="text-sm font-semibold text-gray-800">{allMinisters.length} Ministers</span>
-          <span className="text-sm text-gray-400">· Working for Kerala</span>
+          <span className="text-sm font-semibold text-gray-800 shrink-0">{allMinisters.length} Ministers</span>
+          <span className="text-sm text-gray-400 truncate">· Working for Kerala</span>
         </div>
-        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+        <div className="hidden md:flex items-center gap-1.5 text-xs text-gray-500 shrink-0 ml-4">
           <span>Tip: Tag relevant ministers in your posts for faster response</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
