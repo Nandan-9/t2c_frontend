@@ -6,10 +6,12 @@ import { getMyFollowing } from "@/lib/api/ministers";
 import { PostComposer } from "@/components/ui/PostComposer";
 import { PostCard } from "@/components/ui/PostCard";
 import { AvatarCircle } from "@/components/ui/AvatarCircle";
+import { MobilePostCard } from "@/components/mobile/MobilePostCard";
+import { MobileFeedTabBar } from "@/components/mobile/MobileFeedTabBar";
 import { tokenStorage } from "@/lib/auth/tokens";
 import type { RegularUser } from "@/lib/auth/types";
 
-type Tab = "all" | "trending" | "latest" | "responded";
+export type Tab = "all" | "trending" | "latest" | "responded";
 
 type UpvoteCursor = { kind: "upvote"; cursor_upvote_count: number; cursor_id: number };
 type LatestCursor = { kind: "latest"; cursor_created_at: string; cursor_id: number };
@@ -129,73 +131,102 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Mini composer bar */}
-      {!composerOpen ? (
-        <div
-          className="bg-white rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3 cursor-pointer"
-          onClick={() => setComposerOpen(true)}
-        >
-          <AvatarCircle
-            avatar_url={user?.avatar_url ?? null}
-            username={user?.username ?? "?"}
-            size="sm"
-          />
-          <span className="flex-1 text-sm text-gray-400 select-none">
-            What issue matters to you today?
-          </span>
-          <button
-            onClick={(e) => { e.stopPropagation(); setComposerOpen(true); }}
-            className="bg-[#C92A2A] hover:bg-[#a82323] text-white text-sm font-medium px-4 py-1.5 rounded-lg transition-colors"
+      {/* ── Desktop layout ── */}
+      <div className="hidden md:flex flex-col gap-4">
+        {/* Mini composer bar */}
+        {!composerOpen ? (
+          <div
+            className="bg-white rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3 cursor-pointer"
+            onClick={() => setComposerOpen(true)}
           >
-            Post
-          </button>
-        </div>
-      ) : (
-        <PostComposer onPostCreated={handlePostCreated} />
-      )}
-
-      {/* Tab navigation + feed */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="flex gap-1 border-b border-gray-100 px-4">
-          {TABS.map((t) => (
+            <AvatarCircle
+              avatar_url={user?.avatar_url ?? null}
+              username={user?.username ?? "?"}
+              size="sm"
+            />
+            <span className="flex-1 text-sm text-gray-400 select-none">
+              What issue matters to you today?
+            </span>
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`py-3 px-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
-                tab === t.id ? "text-[#C92A2A]" : "text-gray-400 hover:text-gray-600"
-              }`}
+              onClick={(e) => { e.stopPropagation(); setComposerOpen(true); }}
+              className="bg-[#C92A2A] hover:bg-[#a82323] text-white text-sm font-medium px-4 py-1.5 rounded-lg transition-colors"
             >
-              {t.label}
-              {tab === t.id && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C92A2A] rounded-full" />
-              )}
+              Post
             </button>
-          ))}
+          </div>
+        ) : (
+          <PostComposer onPostCreated={handlePostCreated} />
+        )}
+
+        {/* Tab navigation + feed */}
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="flex gap-1 border-b border-gray-100 px-4">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={`py-3 px-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
+                  tab === t.id ? "text-[#C92A2A]" : "text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                {t.label}
+                {tab === t.id && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C92A2A] rounded-full" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          <div className="divide-y divide-gray-100">
+            {tab === "responded" ? (
+              <RespondedEmpty />
+            ) : loading ? (
+              <Spinner />
+            ) : feed.length === 0 ? (
+              <p className="text-center text-gray-400 text-sm py-12">No posts yet.</p>
+            ) : (
+              <>
+                {isFallback && <FallbackBanner />}
+                {feed.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    currentUserId={user?.id ?? -1}
+                    onDelete={handleDelete}
+                    onEdit={handleEdit}
+                  />
+                ))}
+                {nextCursor && (
+                  <button
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    className="w-full py-3 text-sm text-[#C92A2A] hover:underline disabled:opacity-50"
+                  >
+                    {loadingMore ? "Loading…" : "Load more"}
+                  </button>
+                )}
+              </>
+            )}
+          </div>
         </div>
+      </div>
+
+      {/* ── Mobile layout ── */}
+      <div className="md:hidden -mx-4">
+        <MobileFeedTabBar tab={tab} onTabChange={setTab} />
 
         <div className="divide-y divide-gray-100">
           {tab === "responded" ? (
-            <div className="flex flex-col items-center justify-center py-16 px-6 text-center gap-2">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <p className="text-sm text-gray-400 max-w-xs">
-                If a govt official replies to your post it will appear here
-              </p>
-            </div>
+            <RespondedEmpty />
           ) : loading ? (
-            <Spinner />
+            <div className="py-12"><Spinner /></div>
           ) : feed.length === 0 ? (
             <p className="text-center text-gray-400 text-sm py-12">No posts yet.</p>
           ) : (
             <>
-              {isFallback && (
-                <div className="px-4 py-2 text-xs text-gray-400 bg-gray-50">
-                  You're not following anyone yet — showing all posts.
-                </div>
-              )}
+              {isFallback && <FallbackBanner />}
               {feed.map((post) => (
-                <PostCard
+                <MobilePostCard
                   key={post.id}
                   post={post}
                   currentUserId={user?.id ?? -1}
@@ -224,6 +255,27 @@ function Spinner() {
   return (
     <div className="flex justify-center py-12">
       <div className="w-6 h-6 border-2 border-[#C92A2A] border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
+
+function RespondedEmpty() {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 px-6 text-center gap-2">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <p className="text-sm text-gray-400 max-w-xs">
+        If a govt official replies to your post it will appear here
+      </p>
+    </div>
+  );
+}
+
+function FallbackBanner() {
+  return (
+    <div className="px-4 py-2 text-xs text-gray-400 bg-gray-50">
+      You&apos;re not following anyone yet — showing all posts.
     </div>
   );
 }
