@@ -133,7 +133,13 @@ export const posts = {
 
   editPost(
     id: number,
-    params: { heading?: string; content?: string; status?: "published" | "archived" | "draft" },
+    params: {
+      heading?: string;
+      content?: string;
+      status?: "published" | "archived" | "draft";
+      minister_ids?: number[];
+      department_ids?: number[];
+    },
   ): Promise<Post> {
     return apiRequest("PATCH", `/posts/${id}/`, { body: params });
   },

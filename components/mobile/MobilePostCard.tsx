@@ -185,7 +185,7 @@ export function MobilePostCard({ post, currentUserId, onDelete, onEdit }: Mobile
 
       {/* Action bar */}
       <div
-        className="flex items-center justify-between px-4 py-2.5 border-t border-gray-50"
+        className="flex items-center gap-4 px-4 py-2.5 border-t border-gray-50"
         onClick={(e) => e.stopPropagation()}
       >
         <VoteButtons
