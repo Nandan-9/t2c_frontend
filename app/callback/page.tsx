@@ -22,7 +22,7 @@ function CallbackInner() {
       code,
       redirect_uri: window.location.origin + "/callback",
     })
-      .then(() => router.replace("/home"))
+      .then(() => router.replace("/"))
       .catch((e: unknown) => {
         setError(e instanceof Error ? e.message : "Authentication failed.");
         setTimeout(() => router.replace("/login?error=auth_failed"), 2000);

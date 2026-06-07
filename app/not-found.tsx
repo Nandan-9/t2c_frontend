@@ -16,7 +16,7 @@ export default function NotFound() {
         </div>
 
         <Link
-          href="/home"
+          href="/"
           className="bg-[#C92A2A] text-white rounded px-6 py-2.5 text-sm font-medium hover:bg-[#a82323] transition-colors"
         >
           Go to Home

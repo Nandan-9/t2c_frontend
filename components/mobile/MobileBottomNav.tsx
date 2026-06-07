@@ -5,7 +5,7 @@ import Link from "next/link";
 import { House, Users, Building2, FileText } from "lucide-react";
 
 const NAV_ITEMS = [
-  { href: "/home", label: "Home", Icon: House },
+  { href: "/", label: "Home", Icon: House },
   { href: "/following", label: "Following", Icon: Users },
   { href: "/ministers", label: "Ministers", Icon: Building2 },
   { href: "/my-posts", label: "My Posts", Icon: FileText },

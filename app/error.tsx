@@ -27,7 +27,7 @@ export default function GlobalError({ reset }: { error: Error; reset: () => void
               Try again
             </button>
             <button
-              onClick={() => router.push("/home")}
+              onClick={() => router.push("/")}
               className="bg-[#C92A2A] text-white rounded px-5 py-2.5 text-sm font-medium hover:bg-[#a82323] transition-colors"
             >
               Go to Home

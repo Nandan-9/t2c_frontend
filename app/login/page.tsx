@@ -10,7 +10,7 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (tokenStorage.isLoggedIn()) router.replace("/home");
+    if (tokenStorage.isLoggedIn()) router.replace("/");
   }, [router]);
 
   return (

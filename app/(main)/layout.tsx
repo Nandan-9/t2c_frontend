@@ -79,7 +79,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Mobile FAB — home only, signed-in users only */}
-        {pathname === "/home" && isLoggedIn && (
+        {pathname === "/" && isLoggedIn && (
           <div className="md:hidden">
             <MobileFAB onClick={() => setShowModal(true)} />
           </div>
@@ -210,7 +210,7 @@ function Sidebar({ onNewPost }: { onNewPost: () => void }) {
   const pathname = usePathname();
 
   const navItems = [
-    { href: "/home", label: "Home", Icon: House },
+    { href: "/", label: "Home", Icon: House },
     { href: "/following", label: "Following", Icon: Users },
     { href: "/ministers", label: "Ministers", Icon: Building2 },
     { href: "/my-posts", label: "My Posts", Icon: FileText },
