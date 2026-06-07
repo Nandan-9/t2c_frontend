@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { posts as postsApi } from "@/lib/api/posts";
+import { useAuth } from "@/lib/auth/context";
 
 interface Props {
   postId: number;
@@ -12,12 +13,14 @@ interface Props {
 }
 
 export function VoteButtons({ postId, upvote_count, downvote_count, user_vote, onVoteChange }: Props) {
+  const { isLoggedIn, showLoginPrompt } = useAuth();
   const [upvotes, setUpvotes] = useState(upvote_count);
   const [downvotes, setDownvotes] = useState(downvote_count);
   const [userVote, setUserVote] = useState(user_vote);
   const [loading, setLoading] = useState(false);
 
   async function handleVote(type: "upvote" | "downvote") {
+    if (!isLoggedIn) { showLoginPrompt(); return; }
     if (loading) return;
     setLoading(true);
 

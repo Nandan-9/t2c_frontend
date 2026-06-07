@@ -10,15 +10,15 @@ export interface DistrictPostCount {
 }
 
 export function getDistrictPostCounts(): Promise<DistrictPostCount[]> {
-  return apiRequest("GET", "/users/districts/post-count/");
+  return apiRequest("GET", "/users/districts/post-count/", { auth: false });
 }
 
 export function listDistricts(): Promise<District[]> {
-  return apiRequest("GET", "/users/districts/");
+  return apiRequest("GET", "/users/districts/", { auth: false });
 }
 
 export function getDistrict(id: number): Promise<District> {
-  return apiRequest("GET", `/users/districts/${id}/`);
+  return apiRequest("GET", `/users/districts/${id}/`, { auth: false });
 }
 
 export function createDistrict(payload: { name: string }): Promise<District> {

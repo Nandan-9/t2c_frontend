@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { tokenStorage } from "@/lib/auth/tokens";
@@ -13,63 +14,54 @@ export default function LoginPage() {
   }, [router]);
 
   return (
-    <main className="min-h-screen w-full flex items-center bg-[#f5f5f0]">
-      {/* Left content */}
-      <div className="relative flex-1 flex flex-col justify-center px-12 lg:px-20 py-16 max-w-2xl min-h-screen">
+    <main className="min-h-screen w-full flex flex-col items-center justify-center bg-[#f5f5f0] px-4 py-12">
+      <div className="w-full max-w-sm flex flex-col items-center gap-6">
 
-        {/* Brand */}
-        <div className="flex items-center gap-2 mb-14">
-          <div className="w-8 h-8 rounded-full bg-[#2D2FA3] flex items-center justify-center">
-            <MegaphoneIcon size={16} />
-          </div>
-          <span className="text-sm font-bold tracking-widest text-[#2D2FA3] uppercase">
-            Keralam Speaks
-          </span>
-        </div>
+        {/* Logo */}
+        <Image
+          src="/logos/full_logo.png"
+          alt="Keralam Speaks"
+          width={180}
+          height={60}
+          className="object-contain"
+          priority
+        />
 
         {/* Headline */}
-        <h1 className="text-5xl font-extrabold text-[#1a1a2e] leading-tight mb-1">
-          Your Voice.
-        </h1>
-        <h1 className="text-5xl font-extrabold text-[#2D2FA3] leading-tight mb-4">
-          Stronger Together.
-        </h1>
-        <div className="w-12 h-1 bg-[#2D2FA3] rounded mb-6" />
-
-        <p className="text-[#4a4a6a] text-base leading-relaxed mb-12">
-          Speak up. Share real issues.
-          <br />
-          Let&apos;s build a better Kerala, together.
-        </p>
+        <div className="text-center">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1a1a2e] leading-tight">
+            Your Voice.{" "}
+            <span className="text-[#C92A2A]">Stronger Together.</span>
+          </h1>
+          <p className="text-[#4a4a6a] text-sm sm:text-base mt-3 leading-relaxed">
+            Speak up. Share real issues.
+            <br />
+            Let&apos;s build a better Kerala, together.
+          </p>
+        </div>
 
         {/* Feature icons */}
-        <div className="flex items-start gap-10">
+        <div className="flex items-start justify-center gap-8 w-full py-2">
           <FeatureItem icon={<ChatIcon />} label="Share" sub="Problems" />
           <FeatureItem icon={<TrendIcon />} label="Upvote" sub="What Matters" />
           <FeatureItem icon={<GovIcon />} label="Voice to" sub="Government" />
         </div>
-      </div>
 
-      {/* Right card */}
-      <div className="flex-1 flex items-center justify-center py-16">
-        <div className=" p-10 flex flex-col items-center gap-5 w-full max-w-xs">
-          <div className="w-16 h-16 rounded-full bg-[#2D2FA3] flex items-center justify-center">
-            <MegaphoneIcon size={28} />
-          </div>
+        {/* Divider */}
+        <div className="w-full h-px bg-gray-200" />
 
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-[#1a1a2e]">Keralam Speaks</h2>
-            <p className="text-sm text-gray-400 mt-1">Speak. Support. Strengthen Kerala.</p>
-          </div>
+        {/* Sign in */}
+        <a
+          href={GOOGLE_AUTH_URL}
+          className="flex items-center gap-3 w-full justify-center px-5 py-3 border border-gray-200 rounded-full text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+        >
+          <GoogleIcon />
+          Continue with Google
+        </a>
 
-          <a
-            href={GOOGLE_AUTH_URL}
-            className="flex items-center gap-3 w-full justify-center px-5 py-3 border border-gray-200 rounded-full text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors mt-2"
-          >
-            <GoogleIcon />
-            Continue with Google
-          </a>
-        </div>
+        <p className="text-xs text-[#4a4a6a] text-center">
+          By continuing, you agree to our Terms of Service and Privacy Policy.
+        </p>
       </div>
     </main>
   );
@@ -85,36 +77,17 @@ function FeatureItem({
   sub: string;
 }) {
   return (
-    <div className="flex items-start gap-2">
-      <div className="text-[#4a4a6a] mt-0.5">{icon}</div>
-      <div>
-        <div className="text-xs font-semibold text-[#1a1a2e]">{label}</div>
-        <div className="text-xs text-[#4a4a6a]">{sub}</div>
-      </div>
+    <div className="flex flex-col items-center gap-1.5 text-center">
+      <div className="text-[#C92A2A]">{icon}</div>
+      <div className="text-xs font-semibold text-[#1a1a2e]">{label}</div>
+      <div className="text-xs text-[#4a4a6a]">{sub}</div>
     </div>
-  );
-}
-
-function MegaphoneIcon({ size = 20 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 11l19-9-9 19-2-8-8-2z" />
-    </svg>
   );
 }
 
 function ChatIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </svg>
   );
@@ -122,7 +95,7 @@ function ChatIcon() {
 
 function TrendIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
       <polyline points="17 6 23 6 23 12" />
     </svg>
@@ -131,7 +104,7 @@ function TrendIcon() {
 
 function GovIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <line x1="3" y1="22" x2="21" y2="22" />
       <rect x="3" y="14" width="4" height="8" />
       <rect x="10" y="10" width="4" height="12" />

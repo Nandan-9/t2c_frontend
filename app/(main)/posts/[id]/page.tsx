@@ -8,9 +8,8 @@ import { posts as postsApi, type Post } from "@/lib/api/posts";
 import { comments as commentsApi, type Comment } from "@/lib/api/comments";
 import { PostCard } from "@/components/ui/PostCard";
 import { CommentThread } from "@/components/ui/CommentThread";
-import { tokenStorage } from "@/lib/auth/tokens";
 import { useToast } from "@/hooks/useToast";
-import type { RegularUser } from "@/lib/auth/types";
+import { useAuth } from "@/lib/auth/context";
 
 function insertReply(list: Comment[], parentId: number, reply: Comment): Comment[] {
   return list.map((c) => {
@@ -30,13 +29,13 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
   const { id } = use(params);
   const router = useRouter();
   const { showToast } = useToast();
+  const { user, isLoggedIn, showLoginPrompt } = useAuth();
   const [post, setPost] = useState<Post | null>(null);
   const [commentList, setCommentList] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [commentFocused, setCommentFocused] = useState(false);
-  const user = tokenStorage.getUser() as RegularUser | null;
 
   useEffect(() => {
     const postId = Number(id);
@@ -93,31 +92,42 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
       />
 
       <div className="border-t border-gray-200 pt-4 flex flex-col gap-2">
-        <textarea
-          value={commentText}
-          onChange={(e) => setCommentText(e.target.value)}
-          onFocus={() => setCommentFocused(true)}
-          onBlur={() => { if (!commentText.trim()) setCommentFocused(false); }}
-          placeholder="Write a comment…"
-          rows={commentFocused ? 3 : 1}
-          className="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-[#C92A2A]/30 resize-none transition-all"
-        />
-        {commentFocused && (
-          <div className="flex justify-end gap-2">
-            <button
-              onClick={() => { setCommentText(""); setCommentFocused(false); }}
-              className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleComment}
-              disabled={!commentText.trim() || submitting}
-              className="px-4 py-2 bg-[#C92A2A] text-white text-sm rounded-lg disabled:opacity-50 hover:bg-[#a82323]"
-            >
-              {submitting ? "Posting…" : "Comment"}
-            </button>
-          </div>
+        {isLoggedIn ? (
+          <>
+            <textarea
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              onFocus={() => setCommentFocused(true)}
+              onBlur={() => { if (!commentText.trim()) setCommentFocused(false); }}
+              placeholder="Write a comment…"
+              rows={commentFocused ? 3 : 1}
+              className="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-[#C92A2A]/30 resize-none transition-all"
+            />
+            {commentFocused && (
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => { setCommentText(""); setCommentFocused(false); }}
+                  className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleComment}
+                  disabled={!commentText.trim() || submitting}
+                  className="px-4 py-2 bg-[#C92A2A] text-white text-sm rounded-lg disabled:opacity-50 hover:bg-[#a82323]"
+                >
+                  {submitting ? "Posting…" : "Comment"}
+                </button>
+              </div>
+            )}
+          </>
+        ) : (
+          <button
+            onClick={showLoginPrompt}
+            className="w-full border border-gray-200 rounded-xl p-3 text-sm text-gray-400 text-left hover:border-[#C92A2A] hover:text-[#C92A2A] transition-colors"
+          >
+            Login to comment…
+          </button>
         )}
       </div>
 

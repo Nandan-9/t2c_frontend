@@ -11,7 +11,7 @@ export interface Comment {
 
 export const comments = {
   getComments(postId: number): Promise<Comment[]> {
-    return apiRequest("GET", `/posts/${postId}/comments/`);
+    return apiRequest("GET", `/posts/${postId}/comments/`, { auth: false });
   },
 
   addComment(postId: number, content: string, parent_id?: number): Promise<Comment> {

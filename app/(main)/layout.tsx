@@ -4,11 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { House, Users, Building2, FileText, Bell, ChevronDown, LogOut } from "lucide-react";
 import Image from "next/image";
-import { UserAuthGuard } from "@/components/UserAuthGuard";
+import { AuthProvider, useAuth } from "@/lib/auth/context";
 import { NewPostModal } from "@/components/ui/NewPostModal";
 import { Toaster } from "@/components/ui/Toast";
 import { AvatarCircle } from "@/components/ui/AvatarCircle";
-import { tokenStorage } from "@/lib/auth/tokens";
 import { userLogout } from "@/lib/auth/api";
 import { followMinister,unfollowMinister, getMyFollowing } from "@/lib/api/ministers";
 import { ministers as ministersApi } from "@/lib/api/ministers";
@@ -22,22 +21,28 @@ import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
 import { MobileFAB } from "@/components/mobile/MobileFAB";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthProvider>
+      <MainLayoutInner>{children}</MainLayoutInner>
+    </AuthProvider>
+  );
+}
+
+function MainLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { user, isLoggedIn, showLoginPrompt } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [lastPost, setLastPost] = useState<Post | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
-  const [user, setUser] = useState<RegularUser | null>(null);
 
   useEffect(() => {
-    const u = tokenStorage.getUser() as RegularUser | null;
-    setUser(u);
-    if (!u) return;
-    const key = `welcome_seen_${u.username}`;
+    if (!user) return;
+    const key = `welcome_seen_${user.username}`;
     if (!localStorage.getItem(key)) {
       setShowWelcome(true);
     }
-  }, []);
+  }, [user]);
 
   function dismissWelcome() {
     if (user) localStorage.setItem(`welcome_seen_${user.username}`, "1");
@@ -50,17 +55,18 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <UserAuthGuard>
       <div className="font-[family-name:--font-poppins] min-h-screen bg-[#f5f5f0] flex flex-col overflow-x-clip">
         {/* Headers — direct flex children so sticky works correctly */}
-        <Header user={user} onLogout={handleLogout} className="hidden md:flex" />
-        <MobileHeader user={user} onLogout={handleLogout} className="md:hidden" />
+        <Header user={user} onLogout={handleLogout} onLoginPrompt={showLoginPrompt} className="hidden md:flex" />
+        <MobileHeader user={user} onLogout={handleLogout} onLoginPrompt={showLoginPrompt} className="md:hidden" />
 
         <div className="flex flex-1 min-w-0">
           {/* Desktop sidebar */}
-          <div className="hidden md:flex">
-            <Sidebar onNewPost={() => setShowModal(true)} />
-          </div>
+          {isLoggedIn && (
+            <div className="hidden md:flex">
+              <Sidebar onNewPost={() => setShowModal(true)} />
+            </div>
+          )}
 
           <main className="flex-1 min-w-0 flex justify-center px-4 py-6 pb-24 md:pb-6">
             <div className={`w-full min-w-0 ${pathname === "/ministers" ? "max-w-[1080px]" : "max-w-[980px]"}`}>{children}</div>
@@ -72,16 +78,18 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
 
-        {/* Mobile FAB — home only */}
-        {pathname === "/home" && (
+        {/* Mobile FAB — home only, signed-in users only */}
+        {pathname === "/home" && isLoggedIn && (
           <div className="md:hidden">
             <MobileFAB onClick={() => setShowModal(true)} />
           </div>
         )}
         {/* Mobile bottom nav */}
-        <div className="md:hidden">
-          <MobileBottomNav />
-        </div>
+        {isLoggedIn && (
+          <div className="md:hidden">
+            <MobileBottomNav />
+          </div>
+        )}
 
         {showModal && (
           <NewPostModal
@@ -92,11 +100,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         {showWelcome && user && <WelcomeModal username={user.username} onDismiss={dismissWelcome} />}
         <Toaster />
       </div>
-    </UserAuthGuard>
   );
 }
 
-function Header({ user, onLogout, className }: { user: RegularUser | null; onLogout: () => void; className?: string }) {
+function Header({ user, onLogout, onLoginPrompt, className }: { user: RegularUser | null; onLogout: () => void; onLoginPrompt: () => void; className?: string }) {
   const [showNotif, setShowNotif] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -139,8 +146,8 @@ function Header({ user, onLogout, className }: { user: RegularUser | null; onLog
           )}
         </div>
 
-        {/* User menu */}
-        {user && (
+        {/* User menu or Login */}
+        {user ? (
           <div ref={userMenuRef} className="relative">
             <button
               onClick={() => setShowUserMenu((v) => !v)}
@@ -162,6 +169,13 @@ function Header({ user, onLogout, className }: { user: RegularUser | null; onLog
               </div>
             )}
           </div>
+        ) : (
+          <button
+            onClick={onLoginPrompt}
+            className="bg-[#C92A2A] text-white text-sm font-medium px-4 py-1.5 rounded-lg hover:bg-[#a82323] transition-colors"
+          >
+            Login
+          </button>
         )}
       </div>
     </header>
@@ -235,15 +249,16 @@ function Sidebar({ onNewPost }: { onNewPost: () => void }) {
 }
 
 function RightSidebar({ lastPost }: { lastPost: Post | null }) {
+  const { isLoggedIn } = useAuth();
   const [following, setFollowing] = useState<Follow[]>([]);
   const [allMinisters, setAllMinisters] = useState<Minister[]>([]);
   const [topDepts, setTopDepts] = useState<TopDepartment[]>([]);
   const [trending, setTrending] = useState<Post[]>([]);
 
   useEffect(() => {
-    getMyFollowing().then(setFollowing).catch(() => {});
+    if (isLoggedIn) getMyFollowing().then(setFollowing).catch(() => {});
     ministersApi.list().then(setAllMinisters).catch(() => {});
-  }, [lastPost]);
+  }, [lastPost, isLoggedIn]);
 
   useEffect(() => {
     getTopDepartments().then(setTopDepts).catch(() => {});

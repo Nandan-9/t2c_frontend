@@ -1,23 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { posts as postsApi, type Post } from "@/lib/api/posts";
 import { PostCard } from "@/components/ui/PostCard";
-import { tokenStorage } from "@/lib/auth/tokens";
-import type { RegularUser } from "@/lib/auth/types";
+import { useAuth } from "@/lib/auth/context";
 
 export default function MyPostsPage() {
+  const router = useRouter();
+  const { user, isLoggedIn } = useAuth();
   const [myPosts, setMyPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const user = tokenStorage.getUser() as RegularUser | null;
 
   useEffect(() => {
+    if (!isLoggedIn) { router.replace("/login"); return; }
     if (!user) return;
     postsApi
       .getFeed()
       .then((data) => setMyPosts(data.results.filter((p) => p.author.id === user.id)))
       .finally(() => setLoading(false));
-  }, []);
+  }, [isLoggedIn]);
 
   function handleDelete(id: number) {
     setMyPosts((prev) => prev.filter((p) => p.id !== id));

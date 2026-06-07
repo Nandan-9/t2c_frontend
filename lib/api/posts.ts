@@ -85,21 +85,21 @@ export const posts = {
     const params = cursor?.cursor_id != null
       ? qs({ cursor_upvote_count: cursor.cursor_upvote_count ?? 0, cursor_id: cursor.cursor_id })
       : "";
-    return apiRequest("GET", `/posts/feed/${params}`);
+    return apiRequest("GET", `/posts/feed/${params}`, { auth: false });
   },
 
   getTrending(cursor?: { cursor_upvote_count?: number; cursor_id?: number }): Promise<FeedPage> {
     const params = cursor?.cursor_id != null
       ? qs({ cursor_upvote_count: cursor.cursor_upvote_count ?? 0, cursor_id: cursor.cursor_id })
       : "";
-    return apiRequest("GET", `/posts/trending/${params}`);
+    return apiRequest("GET", `/posts/trending/${params}`, { auth: false });
   },
 
   getLatest(cursor?: { cursor_created_at?: string; cursor_id?: number }): Promise<LatestPage> {
     const params = cursor?.cursor_id != null && cursor.cursor_created_at
       ? qs({ cursor_created_at: cursor.cursor_created_at, cursor_id: cursor.cursor_id })
       : "";
-    return apiRequest("GET", `/posts/latest/${params}`);
+    return apiRequest("GET", `/posts/latest/${params}`, { auth: false });
   },
 
   getPostsByMinisters(
@@ -116,7 +116,7 @@ export const posts = {
   },
 
   getPost(id: number): Promise<PostDetail> {
-    return apiRequest("GET", `/posts/${id}/`);
+    return apiRequest("GET", `/posts/${id}/`, { auth: false });
   },
 
   createPost(params: {

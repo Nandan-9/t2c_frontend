@@ -10,11 +10,11 @@ import type {
 
 export const ministers = {
   list(): Promise<Minister[]> {
-    return apiRequest("GET", "/users/ministers/");
+    return apiRequest("GET", "/users/ministers/", { auth: false });
   },
 
   get(id: number): Promise<Minister> {
-    return apiRequest("GET", `/users/ministers/${id}/`);
+    return apiRequest("GET", `/users/ministers/${id}/`, { auth: false });
   },
 
   create(payload: CreateMinisterPayload): Promise<Minister> {
@@ -38,12 +38,12 @@ export const ministers = {
   },
 
   followers(id: number): Promise<Follower[]> {
-    return apiRequest("GET", `/users/ministers/${id}/followers/`);
+    return apiRequest("GET", `/users/ministers/${id}/followers/`, { auth: false });
   },
 
   searchTags(query: string): Promise<TagResult[]> {
     const q = encodeURIComponent(query);
-    return apiRequest("GET", `/users/ministers/tags/?q=${q}`);
+    return apiRequest("GET", `/users/ministers/tags/?q=${q}`, { auth: false });
   },
 };
 

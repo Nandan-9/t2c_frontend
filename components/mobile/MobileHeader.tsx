@@ -9,10 +9,11 @@ import type { RegularUser } from "@/lib/auth/types";
 interface MobileHeaderProps {
   user: RegularUser | null;
   onLogout: () => void;
+  onLoginPrompt: () => void;
   className?: string;
 }
 
-export function MobileHeader({ user, onLogout, className }: MobileHeaderProps) {
+export function MobileHeader({ user, onLogout, onLoginPrompt, className }: MobileHeaderProps) {
   const [showNotif, setShowNotif] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -51,8 +52,8 @@ export function MobileHeader({ user, onLogout, className }: MobileHeaderProps) {
           )}
         </div>
 
-        {/* User menu */}
-        {user && (
+        {/* User menu or Login */}
+        {user ? (
           <div ref={userMenuRef} className="relative">
             <button
               onClick={() => setShowUserMenu((v) => !v)}
@@ -77,6 +78,13 @@ export function MobileHeader({ user, onLogout, className }: MobileHeaderProps) {
               </div>
             )}
           </div>
+        ) : (
+          <button
+            onClick={onLoginPrompt}
+            className="bg-[#C92A2A] text-white text-sm font-medium px-4 py-1.5 rounded-lg hover:bg-[#a82323] transition-colors"
+          >
+            Login
+          </button>
         )}
       </div>
     </header>

@@ -15,11 +15,11 @@ export interface TopDepartment {
 }
 
 export function listDepartments(): Promise<Department[]> {
-  return apiRequest("GET", "/users/departments/");
+  return apiRequest("GET", "/users/departments/", { auth: false });
 }
 
 export function getTopDepartments(): Promise<TopDepartment[]> {
-  return apiRequest("GET", "/users/departments/top/");
+  return apiRequest("GET", "/users/departments/top/", { auth: false });
 }
 
 export function createDepartment(payload: { name: string; minister_id?: number }): Promise<Department> {

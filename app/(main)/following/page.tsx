@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getMyFollowing } from "@/lib/api/ministers";
 import { posts as postsApi, type Post, type MinistersPage } from "@/lib/api/posts";
 import { PostCard } from "@/components/ui/PostCard";
 import { AvatarCircle } from "@/components/ui/AvatarCircle";
-import { tokenStorage } from "@/lib/auth/tokens";
 import { useToast } from "@/hooks/useToast";
+import { useAuth } from "@/lib/auth/context";
 import type { Follow } from "@/lib/api/types";
-import type { RegularUser } from "@/lib/auth/types";
 
 type MinistersCursor = {
   cursor_upvote_count?: number;
@@ -26,8 +26,9 @@ function nextCursorFrom(page: MinistersPage): MinistersCursor | null {
 }
 
 export default function FollowingPage() {
+  const router = useRouter();
   const { showToast } = useToast();
-  const user = tokenStorage.getUser() as RegularUser | null;
+  const { user, isLoggedIn } = useAuth();
 
   const [following, setFollowing] = useState<Follow[]>([]);
   const [feed, setFeed] = useState<Post[]>([]);
@@ -36,6 +37,7 @@ export default function FollowingPage() {
   const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
+    if (!isLoggedIn) { router.replace("/login"); return; }
     getMyFollowing()
       .then(async (follows) => {
         setFollowing(follows);
@@ -47,7 +49,7 @@ export default function FollowingPage() {
       })
       .catch(() => showToast("Failed to load feed.", "error"))
       .finally(() => setLoadingInit(false));
-  }, []);
+  }, [isLoggedIn]);
 
   function handleDelete(id: number) {
     setFeed((prev) => prev.filter((p) => p.id !== id));

@@ -8,8 +8,7 @@ import { PostCard } from "@/components/ui/PostCard";
 import { AvatarCircle } from "@/components/ui/AvatarCircle";
 import { MobilePostCard } from "@/components/mobile/MobilePostCard";
 import { MobileFeedTabBar } from "@/components/mobile/MobileFeedTabBar";
-import { tokenStorage } from "@/lib/auth/tokens";
-import type { RegularUser } from "@/lib/auth/types";
+import { useAuth } from "@/lib/auth/context";
 
 export type Tab = "all" | "trending" | "latest" | "responded";
 
@@ -35,7 +34,7 @@ function latestCursorFrom(page: LatestPage): LatestCursor | null {
 }
 
 export default function HomePage() {
-  const user = tokenStorage.getUser() as RegularUser | null;
+  const { user, isLoggedIn, showLoginPrompt } = useAuth();
 
   const [composerOpen, setComposerOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("trending");
@@ -72,7 +71,7 @@ export default function HomePage() {
         // "all" feed
         page = await postsApi.getFeed(c);
 
-        if (replace && page.results.length === 0 && !c) {
+        if (replace && page.results.length === 0 && !c && isLoggedIn) {
           // Fallback: show posts from all ministers
           const following = await getMyFollowing().catch(() => []);
           if (following.length > 0) {
@@ -134,7 +133,7 @@ export default function HomePage() {
       {/* ── Desktop layout ── */}
       <div className="hidden md:flex flex-col gap-4">
         {/* Mini composer bar */}
-        {!composerOpen ? (
+        {isLoggedIn && (!composerOpen ? (
           <div
             className="bg-white rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3 cursor-pointer"
             onClick={() => setComposerOpen(true)}
@@ -156,7 +155,7 @@ export default function HomePage() {
           </div>
         ) : (
           <PostComposer onPostCreated={handlePostCreated} />
-        )}
+        ))}
 
         {/* Tab navigation + feed */}
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
