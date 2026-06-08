@@ -8,25 +8,29 @@ import type { RegularUser } from "./types";
 interface AuthContextValue {
   user: RegularUser | null;
   isLoggedIn: boolean;
+  isAuthLoading: boolean;
   showLoginPrompt: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   isLoggedIn: false,
+  isAuthLoading: true,
   showLoginPrompt: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<RegularUser | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     setUser(tokenStorage.getUser() as RegularUser | null);
+    setIsAuthLoading(false);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn: !!user, showLoginPrompt: () => setModalOpen(true) }}>
+    <AuthContext.Provider value={{ user, isLoggedIn: !!user, isAuthLoading, showLoginPrompt: () => setModalOpen(true) }}>
       {children}
       {modalOpen && <LoginPromptModal onClose={() => setModalOpen(false)} />}
     </AuthContext.Provider>

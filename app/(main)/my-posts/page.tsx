@@ -8,18 +8,19 @@ import { useAuth } from "@/lib/auth/context";
 
 export default function MyPostsPage() {
   const router = useRouter();
-  const { user, isLoggedIn } = useAuth();
+  const { user, isLoggedIn, isAuthLoading } = useAuth();
   const [myPosts, setMyPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (isAuthLoading) return;
     if (!isLoggedIn) { router.replace("/login"); return; }
     if (!user) return;
     postsApi
       .getFeed()
       .then((data) => setMyPosts(data.results.filter((p) => p.author.id === user.id)))
       .finally(() => setLoading(false));
-  }, [isLoggedIn]);
+  }, [isLoggedIn, isAuthLoading]);
 
   function handleDelete(id: number) {
     setMyPosts((prev) => prev.filter((p) => p.id !== id));

@@ -28,7 +28,7 @@ function nextCursorFrom(page: MinistersPage): MinistersCursor | null {
 export default function FollowingPage() {
   const router = useRouter();
   const { showToast } = useToast();
-  const { user, isLoggedIn } = useAuth();
+  const { user, isLoggedIn, isAuthLoading } = useAuth();
 
   const [following, setFollowing] = useState<Follow[]>([]);
   const [feed, setFeed] = useState<Post[]>([]);
@@ -37,6 +37,7 @@ export default function FollowingPage() {
   const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
+    if (isAuthLoading) return;
     if (!isLoggedIn) { router.replace("/login"); return; }
     getMyFollowing()
       .then(async (follows) => {
@@ -49,7 +50,7 @@ export default function FollowingPage() {
       })
       .catch(() => showToast("Failed to load feed.", "error"))
       .finally(() => setLoadingInit(false));
-  }, [isLoggedIn]);
+  }, [isLoggedIn, isAuthLoading]);
 
   function handleDelete(id: number) {
     setFeed((prev) => prev.filter((p) => p.id !== id));
