@@ -87,7 +87,7 @@ export function CommentThread({
               )}
             </div>
           </div>
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+          <p className="text-sm text-gray-700 whitespace-pre-wrap wrap-break-word">{comment.content}</p>
 
           {replyOpen && (
             <div className="mt-2 flex flex-col gap-2">
