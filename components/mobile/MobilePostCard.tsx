@@ -24,6 +24,7 @@ export function MobilePostCard({ post, currentUserId, onDelete, onEdit }: Mobile
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [imgPortrait, setImgPortrait] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const hasBadges =
@@ -123,7 +124,7 @@ export function MobilePostCard({ post, currentUserId, onDelete, onEdit }: Mobile
         <h2 className="text-base font-bold text-gray-900 line-clamp-2 mb-1 leading-snug">
           {post.heading}
         </h2>
-        <p className="text-sm text-gray-700 line-clamp-3 leading-relaxed">
+        <p className="text-sm text-gray-700 line-clamp-3 leading-relaxed wrap-break-word">
           {post.content}
         </p>
       </div>
@@ -131,13 +132,17 @@ export function MobilePostCard({ post, currentUserId, onDelete, onEdit }: Mobile
       {/* Full-width media */}
       {post.media_url && post.media_type === "image" && (
         <div
-          className="w-full aspect-video bg-gray-50 cursor-pointer overflow-hidden"
+          className={`${imgPortrait ? "w-3/5 mx-auto aspect-9/16 rounded-xl" : "w-full aspect-video"} bg-gray-50 cursor-pointer overflow-hidden`}
           onClick={navigateToPost}
         >
           <img
             src={post.media_url}
             alt=""
             className="w-full h-full object-cover"
+            onLoad={(e) => {
+              const { naturalWidth, naturalHeight } = e.currentTarget;
+              setImgPortrait(naturalWidth < naturalHeight);
+            }}
           />
         </div>
       )}

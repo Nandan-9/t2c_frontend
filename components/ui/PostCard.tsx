@@ -44,6 +44,7 @@ export function PostCard({ post, currentUserId, onDelete, onEdit, detailView }: 
   const [reportOpen, setReportOpen] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [mediaViewer, setMediaViewer] = useState(false);
+  const [imgPortrait, setImgPortrait] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const deptRef = useRef<HTMLDivElement>(null);
 
@@ -309,14 +310,22 @@ export function PostCard({ post, currentUserId, onDelete, onEdit, detailView }: 
         ) : (
           <>
             <h2 className="text-xl font-bold text-gray-900 mb-1.5 leading-snug">{post.heading}</h2>
-            <p className="text-base text-gray-700 whitespace-pre-wrap mb-4">{post.content}</p>
+            <p className="text-base text-gray-700 whitespace-pre-wrap wrap-break-word mb-4">{post.content}</p>
 
             {post.media_url && post.media_type === "image" && (
               <div
-                className={`aspect-video rounded-xl overflow-hidden border border-gray-100 mb-4 bg-gray-50 flex items-center justify-center ${detailView ? "cursor-zoom-in" : ""}`}
+                className={`${imgPortrait ? "aspect-9/16 max-w-75 mx-auto" : "aspect-video"} rounded-xl overflow-hidden border border-gray-100 mb-4 bg-gray-50 flex items-center justify-center ${detailView ? "cursor-zoom-in" : ""}`}
                 onClick={detailView ? (e) => { e.stopPropagation(); setMediaViewer(true); } : undefined}
               >
-                <img src={post.media_url} alt="" className="max-w-full max-h-full object-contain" />
+                <img
+                  src={post.media_url}
+                  alt=""
+                  className="max-w-full max-h-full object-contain"
+                  onLoad={(e) => {
+                    const { naturalWidth, naturalHeight } = e.currentTarget;
+                    setImgPortrait(naturalWidth < naturalHeight);
+                  }}
+                />
               </div>
             )}
             {post.media_url && post.media_type === "video" && (
