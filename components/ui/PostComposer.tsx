@@ -16,7 +16,7 @@ interface Props {
   onPostCreated: (post: Post) => void;
 }
 
-const MAX_CHARS = 500;
+const MAX_CHARS = 2700;
 
 export function PostComposer({ onPostCreated }: Props) {
   const { showToast } = useToast();
@@ -159,13 +159,21 @@ export function PostComposer({ onPostCreated }: Props) {
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col gap-3">
-      <input
-        value={heading}
-        onChange={(e) => setHeading(e.target.value)}
-        onFocus={() => setFocused(true)}
-        placeholder="Title"
-        className="w-full outline-none text-sm font-semibold text-gray-800 placeholder:text-gray-400"
-      />
+      <div className="flex items-center gap-2">
+        <input
+          value={heading}
+          onChange={(e) => setHeading(e.target.value.slice(0, 250))}
+          onFocus={() => setFocused(true)}
+          maxLength={250}
+          placeholder="Title"
+          className="flex-1 outline-none text-sm font-semibold text-gray-800 placeholder:text-gray-400"
+        />
+        {heading.length > 0 && (
+          <span className={`text-xs shrink-0 ${heading.length >= 240 ? "text-red-500" : "text-gray-400"}`}>
+            {250 - heading.length}
+          </span>
+        )}
+      </div>
 
       <div className="relative">
         <textarea
@@ -326,8 +334,8 @@ export function PostComposer({ onPostCreated }: Props) {
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <span className={`text-xs ${remaining < 50 ? "text-red-500" : "text-gray-400"}`}>
-              {remaining}
+            <span className={`text-xs ${remaining < 50 ? "text-red-500" : "text-white"}`}>
+              {remaining} 
             </span>
             <button
               onClick={handlePost}
